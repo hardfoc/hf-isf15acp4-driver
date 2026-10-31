@@ -1,5 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classisf15acp4_1_1GraphicsSurface.html" title=" " alt="" coords="5,5,204,45"/>
-<area shape="rect" id="Node000001" href="$classisf15acp4_1_1GraphicsContext.html" title="Owns the active graphics backend selected at construction time." alt="" coords="252,13,453,38"/>
-<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="217,23,252,23,252,28,217,28"/>
+<area shape="rect" id="Node000000" href="$classisf15acp4_1_1GraphicsSurface.html" title=" " alt="" coords="5,5,204,50"/>
+<area shape="rect" id="Node000001" href="$classisf15acp4_1_1GraphicsContext.html" title="Owns the active graphics backend selected at construction time." alt="" coords="252,14,452,42"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="219,25,254,28,248,28,220,30"/>
 </map>
