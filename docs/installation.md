@@ -9,7 +9,7 @@ nav_order: 12
 ## CMake (recommended)
 
 ```bash
-git clone https://github.com/N3b3x/hf-isf15acp4-driver.git
+git clone https://github.com/hardfoc/hf-isf15acp4-driver.git
 cd hf-isf15acp4-driver
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
