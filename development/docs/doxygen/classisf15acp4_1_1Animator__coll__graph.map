@@ -1,13 +1,13 @@
 <map id="isf15acp4::Animator" name="isf15acp4::Animator">
-<area shape="rect" id="Node000001" title="Drives timed frame updates on top of a GraphicsContext." alt="" coords="980,70,1133,95"/>
-<area shape="rect" id="Node000002" href="$classisf15acp4_1_1GraphicsContext.html" title="Owns the active graphics backend selected at construction time." alt="" coords="660,70,861,95"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="876,80,980,80,980,85,876,85"/>
-<area shape="rect" id="Node000003" href="$classisf15acp4_1_1GraphicsSurface.html" title=" " alt="" coords="337,5,536,45"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="550,43,689,67,688,73,549,48"/>
-<area shape="rect" id="Node000004" href="$classisf15acp4_1_1Canvas.html" title="CPU&#45;side RGB565 framebuffer with basic drawing operations." alt="" coords="366,70,507,95"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="521,80,660,80,660,85,521,85"/>
-<area shape="rect" id="Node000005" href="$structisf15acp4_1_1DisplayGeometry.html" title="Compile&#45;time display geometry for a product variant." alt="" coords="5,70,212,95"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="226,80,366,80,366,85,226,85"/>
-<area shape="rect" id="Node000006" href="$structisf15acp4_1_1DisplayPresenter.html" title="Type&#45;erased presenter used by HardwareDirect backend." alt="" coords="335,119,539,145"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="539,115,636,100,681,93,682,98,636,105,540,120"/>
+<area shape="rect" id="Node000001" title="Drives timed frame updates on top of a GraphicsContext." alt="" coords="976,74,1129,102"/>
+<area shape="rect" id="Node000002" href="$classisf15acp4_1_1GraphicsContext.html" title="Owns the active graphics backend selected at construction time." alt="" coords="658,74,858,102"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="874,85,978,88,973,88,874,90"/>
+<area shape="rect" id="Node000003" href="$classisf15acp4_1_1GraphicsSurface.html" title=" " alt="" coords="336,5,534,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="550,46,682,73,677,73,550,52"/>
+<area shape="rect" id="Node000004" href="$classisf15acp4_1_1Canvas.html" title="CPU&#45;side RGB565 framebuffer with basic drawing operations." alt="" coords="365,74,506,102"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="521,85,660,87,655,88,521,90"/>
+<area shape="rect" id="Node000005" href="$structisf15acp4_1_1DisplayGeometry.html" title="Compile&#45;time display geometry for a product variant." alt="" coords="5,74,212,102"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="227,85,367,87,362,89,227,90"/>
+<area shape="rect" id="Node000006" href="$structisf15acp4_1_1DisplayPresenter.html" title="Type&#45;erased presenter used by HardwareDirect backend." alt="" coords="334,126,537,154"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="552,120,634,107,677,102,682,102,634,113,553,126"/>
 </map>

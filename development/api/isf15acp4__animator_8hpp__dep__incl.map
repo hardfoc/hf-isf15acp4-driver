@@ -1,5 +1,5 @@
 <map id="inc/isf15acp4_animator.hpp" name="inc/isf15acp4_animator.hpp">
-<area shape="rect" id="Node000001" title="Frame sequencer and procedural animation helpers for SmartDisplay." alt="" coords="5,5,207,31"/>
-<area shape="rect" id="Node000002" href="$isf15acp4__animation__demo_8cpp.html" title="Procedural animation showcase with swappable graphics backend." alt="" coords="23,79,189,133"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,44,109,79,103,79,103,44"/>
+<area shape="rect" id="Node000001" title="Frame sequencer and procedural animation helpers for SmartDisplay." alt="" coords="5,5,206,33"/>
+<area shape="rect" id="Node000002" href="$isf15acp4__animation__demo_8cpp.html" title="Procedural animation showcase with swappable graphics backend." alt="" coords="23,81,188,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,47,108,81,103,80,104,51"/>
 </map>

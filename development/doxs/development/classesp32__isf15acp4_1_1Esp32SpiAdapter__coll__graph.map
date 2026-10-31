@@ -1,9 +1,9 @@
 <map id="esp32_isf15acp4::Esp32SpiAdapter" name="esp32_isf15acp4::Esp32SpiAdapter">
-<area shape="rect" id="Node000001" title="ESP&#45;IDF implementation of isf15acp4::SpiInterface CRTP contract." alt="" coords="316,63,515,103"/>
-<area shape="rect" id="Node000002" href="$classisf15acp4_1_1SpiInterface.html" title=" " alt="" coords="32,5,203,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,42,316,61,315,66,216,47"/>
-<area shape="rect" id="Node000003" href="$structesp32__isf15acp4_1_1SpiBusConfig.html" title=" " alt="" coords="5,70,229,95"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="243,80,316,80,316,85,243,85"/>
-<area shape="rect" id="Node000004" href="$structesp32__isf15acp4_1_1PinConfig.html" title=" " alt="" coords="17,119,217,145"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="208,114,315,96,316,102,208,120"/>
+<area shape="rect" id="Node000001" title="ESP&#45;IDF implementation of isf15acp4::SpiInterface CRTP contract." alt="" coords="315,65,512,110"/>
+<area shape="rect" id="Node000002" href="$classisf15acp4_1_1SpiInterface.html" title=" " alt="" coords="32,5,202,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,45,317,67,312,69,217,51"/>
+<area shape="rect" id="Node000003" href="$structesp32__isf15acp4_1_1SpiBusConfig.html" title=" " alt="" coords="5,74,229,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="244,85,317,87,311,88,244,90"/>
+<area shape="rect" id="Node000004" href="$structesp32__isf15acp4_1_1PinConfig.html" title=" " alt="" coords="17,126,217,154"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="218,120,290,107,311,106,317,105,291,113,219,125"/>
 </map>

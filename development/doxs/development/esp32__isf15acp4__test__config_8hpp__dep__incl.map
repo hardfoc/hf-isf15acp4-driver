@@ -1,14 +1,14 @@
 <map id="examples/esp32/main/esp32_isf15acp4_test_config.hpp" name="examples/esp32/main/esp32_isf15acp4_test_config.hpp">
-<area shape="rect" id="Node000001" title="Shared pin and SPI constants for ISF15ACP4 ESP32 examples." alt="" coords="537,5,704,60"/>
-<area shape="rect" id="Node000002" href="$esp32__isf15acp4__setup_8hpp.html" title="Factory helpers for ISF15ACP4 SPI adapter and SmartDisplay config." alt="" coords="447,108,653,148"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="595,73,566,110,562,106,590,69"/>
-<area shape="rect" id="Node000005" href="$isf15acp4__comprehensive__test_8cpp.html" title="Comprehensive ISF15ACP4 SmartDisplay driver validation for ESP32." alt="" coords="664,196,860,251"/>
-<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="651,69,744,194,740,197,646,72"/>
-<area shape="rect" id="Node000003" href="$isf15acp4__animation__demo_8cpp.html" title="Procedural animation showcase with swappable graphics backend." alt="" coords="5,196,172,251"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="434,151,313,172,185,199,173,201,172,196,184,193,312,167,433,145"/>
-<area shape="rect" id="Node000004" href="$isf15acp4__button__dashboard_8cpp.html" title="Motor&#45;style dashboard with gauge, debounced button, and graphics backend selection." alt="" coords="197,203,437,243"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="491,156,365,206,363,201,489,151"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="606,151,703,193,701,198,604,156"/>
-<area shape="rect" id="Node000006" href="$isf15acp4__ui__demo_8cpp.html" title="Interactive UI demo for the ISF15ACP4 SmartDisplay on ESP32." alt="" coords="461,203,639,243"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="553,162,553,203,547,203,547,162"/>
+<area shape="rect" id="Node000001" title="Shared pin and SPI constants for ISF15ACP4 ESP32 examples." alt="" coords="534,5,700,67"/>
+<area shape="rect" id="Node000002" href="$esp32__isf15acp4__setup_8hpp.html" title="Factory helpers for ISF15ACP4 SPI adapter and SmartDisplay config." alt="" coords="445,115,651,160"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="590,78,565,117,561,112,585,81"/>
+<area shape="rect" id="Node000005" href="$isf15acp4__comprehensive__test_8cpp.html" title="Comprehensive ISF15ACP4 SmartDisplay driver validation for ESP32." alt="" coords="661,208,856,269"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="648,77,740,208,735,206,646,82"/>
+<area shape="rect" id="Node000003" href="$isf15acp4__animation__demo_8cpp.html" title="Procedural animation showcase with swappable graphics backend." alt="" coords="5,208,171,269"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="427,158,311,182,183,210,172,213,170,208,182,205,310,177,433,157"/>
+<area shape="rect" id="Node000004" href="$isf15acp4__button__dashboard_8cpp.html" title="Motor&#45;style dashboard with gauge, debounced button, and graphics backend selection." alt="" coords="195,216,434,261"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="486,166,367,218,365,213,480,167"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="608,164,697,207,692,207,607,169"/>
+<area shape="rect" id="Node000006" href="$isf15acp4__ui__demo_8cpp.html" title="Interactive UI demo for the ISF15ACP4 SmartDisplay on ESP32." alt="" coords="459,216,637,261"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="550,173,550,217,546,214,546,177"/>
 </map>

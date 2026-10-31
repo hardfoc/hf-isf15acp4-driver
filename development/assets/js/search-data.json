@@ -792,7 +792,7 @@
   },"113": {
     "doc": "Installation",
     "title": "CMake (recommended)",
-    "content": "| 1 2 3 4 5 . | git clone https://github.com/N3b3x/hf-isf15acp4-driver.git cd hf-isf15acp4-driver cmake -S . -B build -DCMAKE_BUILD_TYPE=Release cmake --build build cmake --install build --prefix /path/to/install . | . Consume from another CMake project: . | 1 2 . | find_package(hf_isf15acp4 REQUIRED) target_link_libraries(my_app PRIVATE hf::isf15acp4) . | . ",
+    "content": "| 1 2 3 4 5 . | git clone https://github.com/hardfoc/hf-isf15acp4-driver.git cd hf-isf15acp4-driver cmake -S . -B build -DCMAKE_BUILD_TYPE=Release cmake --build build cmake --install build --prefix /path/to/install . | . Consume from another CMake project: . | 1 2 . | find_package(hf_isf15acp4 REQUIRED) target_link_libraries(my_app PRIVATE hf::isf15acp4) . | . ",
     "url": "/hf-isf15acp4-driver/development/docs/installation.html#cmake-recommended",
     
     "relUrl": "/docs/installation.html#cmake-recommended"
