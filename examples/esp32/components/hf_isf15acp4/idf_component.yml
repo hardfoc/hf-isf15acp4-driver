@@ -7,9 +7,9 @@ maintainers:
   - "HardFOC"
 license: "GPL-3.0"
 
-url: https://github.com/N3b3x/hf-isf15acp4-driver
-repository: https://github.com/N3b3x/hf-isf15acp4-driver
-issues: https://github.com/N3b3x/hf-isf15acp4-driver/issues
+url: https://github.com/hardfoc/hf-isf15acp4-driver
+repository: https://github.com/hardfoc/hf-isf15acp4-driver
+issues: https://github.com/hardfoc/hf-isf15acp4-driver/issues
 
 targets:
   - esp32

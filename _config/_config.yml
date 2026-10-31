@@ -85,21 +85,21 @@ toggle_auto_mode: true
 
 aux_links:
   "📚 GitHub Repository":
-    - "https://github.com/N3b3x/hf-isf15acp4-driver"
+    - "https://github.com/hardfoc/hf-isf15acp4-driver"
   "🐛 Report Issues":
-    - "https://github.com/N3b3x/hf-isf15acp4-driver/issues"
+    - "https://github.com/hardfoc/hf-isf15acp4-driver/issues"
 
 footer_content: >
   Built with ❤️ using Just the Docs • GPL v3 License •
-  <a href="https://github.com/N3b3x/hf-isf15acp4-driver">View on GitHub</a>
+  <a href="https://github.com/hardfoc/hf-isf15acp4-driver">View on GitHub</a>
 
 just_the_docs:
   nav_fold: true
   nav_external_links:
     - title: "📚 GitHub Repository"
-      url: "https://github.com/N3b3x/hf-isf15acp4-driver"
+      url: "https://github.com/hardfoc/hf-isf15acp4-driver"
     - title: "🐛 Issues"
-      url: "https://github.com/N3b3x/hf-isf15acp4-driver/issues"
+      url: "https://github.com/hardfoc/hf-isf15acp4-driver/issues"
   head_custom: _includes/head_custom.html
   custom_css:
     - assets/css/custom.css
@@ -136,7 +136,7 @@ seo:
   name: "HardFOC ISF15ACP4 Driver"
   description: >
     Hardware-agnostic C++ driver for NKK ISF15ACP4 SmartDisplay OLED pushbutton
-  url: "https://n3b3x.github.io/hf-isf15acp4-driver"
+  url: "https://hardfoc.github.io/hf-isf15acp4-driver"
   twitter:
     card: "summary_large_image"
     site: "@n3b3x"
@@ -147,7 +147,7 @@ seo:
 social:
   name: "HardFOC ISF15ACP4 Driver"
   links:
-    - "https://github.com/N3b3x/hf-isf15acp4-driver"
+    - "https://github.com/hardfoc/hf-isf15acp4-driver"
 
 compress_html:
   clippings: all
