@@ -48,7 +48,7 @@ extern "C" void app_main(void) {
         const auto event = button.Update(display.IsPressed(), elapsed_ms);
         if (event == isf15acp4::ButtonEvent::Click) {
             running = !running;
-            ESP_LOGI(kTag, running ? "RUN" : "STOP");
+            ESP_LOGI(kTag, "%s", running ? "RUN" : "STOP");
         } else if (event == isf15acp4::ButtonEvent::LongPress) {
             rpm = 0.0f;
             running = false;
