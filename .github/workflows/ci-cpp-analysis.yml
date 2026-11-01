@@ -11,6 +11,5 @@ jobs:
   cppcheck:
     uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-cpp-analysis.yml@main
     with:
-      source_dirs: "inc,src,examples/esp32/main"
-      suppressions: "_config/cppcheck-suppressions.txt"
+      paths: "inc src examples/esp32/main"
       std: "c++20"
