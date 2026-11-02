@@ -1,7 +1,5 @@
 # ESP32 ISF15ACP4 Examples
 
-![Dashboard UI concept](../docs/assets/isf15acp4-ui-dashboard-mockup.png)
-
 Four example applications demonstrate the full driver — from API validation to animated, button-driven UIs.
 
 ## Apps
@@ -72,6 +70,6 @@ display.Present(gfx);
 
 ## Further Reading
 
-- [Animations Guide](../../docs/animations.md)
-- [Graphics Engines](../../docs/graphics_engines.md)
-- [Hardware Notes](../../docs/hardware.md)
+- [Animations](../../docs/animations.md)
+- [Graphics](../../docs/graphics.md)
+- [Hardware](../../docs/hardware.md)

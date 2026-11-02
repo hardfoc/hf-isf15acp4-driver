@@ -17,7 +17,8 @@ Validates the full driver stack on real hardware:
 
 ## Hardware
 
-Wire the ISF15ACP4 per [../../../docs/hardware_setup.md](../../../docs/hardware_setup.md). Default GPIO map is in `main/esp32_isf15acp4_test_config.hpp` (overridable via `menuconfig` → **HF ISF15ACP4 SmartDisplay**).
+Wire the ISF15ACP4 per [../../../docs/hardware.md](../../../docs/hardware.md). The default GPIO map is in
+`main/esp32_isf15acp4_test_config.hpp` (overridable via `menuconfig` → **HF ISF15ACP4 SmartDisplay**).
 
 ## Build
 
@@ -28,7 +29,8 @@ Wire the ISF15ACP4 per [../../../docs/hardware_setup.md](../../../docs/hardware_
 
 ## Expected Output
 
-Serial log shows `PASS:` lines for each stage, then `=== TEST SUMMARY ===`. With hardware connected, the OLED cycles blue/red, draws text and shapes, then enters a live button indicator loop.
+Serial log shows `PASS:` lines for each stage, then `=== TEST SUMMARY ===`. With hardware connected, the OLED
+cycles blue/red, draws text and shapes, then enters a live button indicator loop.
 
 ## CI
 

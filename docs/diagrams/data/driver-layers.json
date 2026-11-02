@@ -1,0 +1,35 @@
+{
+  "calls": [
+    "Initialize",
+    "DisplayOn",
+    "DisplayOff",
+    "DisplayDim",
+    "SetMasterCurrent",
+    "SetWindow",
+    "SetFullWindow",
+    "WritePixels",
+    "DrawCanvas",
+    "Present",
+    "DrawPixel",
+    "FillScreen",
+    "DrawLine",
+    "DrawRectangle",
+    "ClearWindow",
+    "IsPressed",
+    "ConfigureScroll"
+  ],
+  "port_hooks": [
+    "EnsureInitialized",
+    "BeginCommand",
+    "BeginData",
+    "EndTransaction",
+    "WriteBytes",
+    "GpioSet",
+    "GpioRead",
+    "DelayUs"
+  ],
+  "sources": [
+    "inc/isf15acp4.hpp:SmartDisplay public calls",
+    "inc/isf15acp4_spi_interface.hpp:SpiInterface"
+  ]
+}
