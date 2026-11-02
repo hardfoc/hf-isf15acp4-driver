@@ -297,6 +297,29 @@ TEST_CASE("WriteColors needs Initialize() and a buffer, and uses one data transa
   CHECK(spi.transactions[0].bytes == bytes({0x07, 0xFF, 0xFF, 0xE0, 0xFF, 0xFF}));
 }
 
+TEST_CASE("A HardwareDirect context from CreateGraphicsContext() draws on the display without ConfigurePresenter") {
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi, isf15acp4::SmartDisplayConfig{.graphics = isf15acp4::GraphicsBackend::HardwareDirect});
+  REQUIRE(display.Initialize());
+  auto gfx = display.CreateGraphicsContext();
+  spi.clear();
+  gfx.DrawHLine(0, 10, 5, isf15acp4::colors::White);
+  const auto cmds = spi.commands();
+  REQUIRE(!cmds.empty());
+  CHECK(cmds.back() == bytes({0x21, 0, 5, 10, 5, 0x3E, 0x3F, 0x3E}));
+  CHECK(gfx.GetPixel(0, 5) == isf15acp4::colors::Black);  // nothing went to the canvas
+
+  // A const display hands out an unbound context; ConfigurePresenter() binds it.
+  const Display& const_display = display;
+  auto unbound = const_display.CreateGraphicsContext();
+  spi.clear();
+  unbound.DrawHLine(0, 10, 5, isf15acp4::colors::White);
+  CHECK(spi.transactions.empty());
+  display.ConfigurePresenter(unbound);
+  unbound.DrawHLine(0, 10, 5, isf15acp4::colors::White);
+  CHECK(!spi.transactions.empty());
+}
+
 TEST_CASE("IsPressed reads the Switch pin through the port") {
   isf15acp4_test::MockSpi spi;
   Display display(&spi);

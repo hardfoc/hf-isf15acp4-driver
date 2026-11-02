@@ -40,6 +40,9 @@ code that used the affected API; together they call for a major version bump at 
   passed RAM addresses (`10h`..`4Fh`, `16h`..`49h`) to `SetWindow()`, which checks display coordinates.
   `SetWindow()`, `DrawLine()`, `DrawRectangle()` and `ClearWindow()` now take display coordinates and add the
   variant's RAM offset (NKK Application Notes rev H, Tables 4 and 5).
+- With `GraphicsBackend::HardwareDirect`, `Initialize()` bound the display to a temporary context, so contexts
+  from `CreateGraphicsContext()` drew into RAM and nothing reached the panel. `CreateGraphicsContext()` on a
+  non-const display now returns a bound context; a `const` display still returns an unbound one.
 
 ### Documentation
 

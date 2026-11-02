@@ -19,8 +19,7 @@ bool hardware_direct(MySpi& spi) {
   if (!display.Initialize()) {
     return false;
   }
-  auto gfx = display.CreateGraphicsContext();
-  display.ConfigurePresenter(gfx);                        // bind THIS context to the display
+  auto gfx = display.CreateGraphicsContext();             // already bound to this display
 
   gfx.FillRect({8, 8, 87, 55}, colors::Blue);             // sent at once as 26h / 22h
   gfx.DrawHLine(8, 87, 31, colors::White);                // sent at once as 21h

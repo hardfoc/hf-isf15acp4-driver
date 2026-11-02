@@ -117,10 +117,22 @@ public:
     /** @brief Present any graphics backend to the panel. */
     bool Present(const GraphicsContext& gfx) noexcept;
 
-    /** @brief Create a graphics context matching this display configuration. */
+    /**
+     * @brief Create a graphics context matching this display configuration.
+     *
+     * With GraphicsBackend::HardwareDirect the returned context is already bound to this display
+     * (ConfigurePresenter()), so its shapes go to the panel at once. The display must outlive the context.
+     */
+    [[nodiscard]] GraphicsContext CreateGraphicsContext() noexcept;
+
+    /**
+     * @brief Create an unbound graphics context matching this display configuration.
+     *
+     * A const display cannot bind itself: for HardwareDirect, call ConfigurePresenter() on the result.
+     */
     [[nodiscard]] GraphicsContext CreateGraphicsContext() const noexcept;
 
-    /** @brief Register presenter hooks for HardwareDirect backend. */
+    /** @brief Register presenter hooks for HardwareDirect backend (bind this display to @p gfx). */
     void ConfigurePresenter(GraphicsContext& gfx) noexcept;
 
     /** @brief Active graphics backend selected at construction. */

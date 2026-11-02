@@ -41,8 +41,9 @@ Every context holds a full 96 x 64 frame (12,288 bytes), so create one and keep 
 
 What to know before choosing it:
 
-- **Bind the context you draw on.** `ConfigurePresenter(gfx)` connects that one context to the display. The
-  binding `Initialize()` makes is on a temporary context and does not carry over.
+- **The context comes bound.** `display.CreateGraphicsContext()` connects the context it returns to the display.
+  A context you construct yourself, or get from a `const` display, needs `display.ConfigurePresenter(gfx)`.
+  Keep the display alive as long as the context.
 - **Text and images stay in RAM.** `DrawChar()`, `DrawString()` and `BlitRgb565()` draw into the context's frame,
   which `Present()` never sends in this mode.
 - **It saves no RAM.** The context still holds a 12,288-byte frame, and `Clear()` becomes `FillScreen()`, which

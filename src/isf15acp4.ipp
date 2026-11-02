@@ -137,11 +137,6 @@ bool SmartDisplay<SpiType>::Initialize(bool enable_vcc) noexcept {
         return false;
     }
 
-    if (config_.graphics == GraphicsBackend::HardwareDirect) {
-        GraphicsContext gfx = CreateGraphicsContext();
-        ConfigurePresenter(gfx);
-    }
-
     initialized_ = true;
     return true;
 }
@@ -295,6 +290,15 @@ bool SmartDisplay<SpiType>::DrawCanvas(const Canvas& canvas) noexcept {
 template <typename SpiType>
 GraphicsContext SmartDisplay<SpiType>::CreateGraphicsContext() const noexcept {
     return GraphicsContext(variant_, config_.graphics);
+}
+
+template <typename SpiType>
+GraphicsContext SmartDisplay<SpiType>::CreateGraphicsContext() noexcept {
+    GraphicsContext gfx(variant_, config_.graphics);
+    if (config_.graphics == GraphicsBackend::HardwareDirect) {
+        ConfigurePresenter(gfx);
+    }
+    return gfx;
 }
 
 template <typename SpiType>
