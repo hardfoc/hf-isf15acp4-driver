@@ -62,8 +62,15 @@ struct InitStep {
     uint8_t data_len;
 };
 
-/** @brief Minimum reset pulse width per NKK timing specifications. */
+/** @brief Minimum RES# low pulse width (SSD1331 rev 1.2 Table 18; NKK power ON sequence). */
 inline constexpr uint32_t kResetPulseMinUs = 3;
+
+/**
+ * @brief Wait after releasing RES# before the first command.
+ *
+ * The SSD1331 reset completion time is 2 us maximum (rev 1.2 Table 18); the driver waits longer for margin.
+ */
+inline constexpr uint32_t kResetRecoveryUs = 10;
 
 /** @brief Maximum SPI clock per datasheet (6.6 MHz). */
 inline constexpr uint32_t kMaxSpiClockHz = 6'600'000;

@@ -29,7 +29,7 @@ nothing to allocate.
 | `WriteBytes(data, len)` | Send `len` bytes (up to 12,288), blocking until sent |
 | `GpioSet(pin, signal)` | Drive SS, D/C, RES or VCC enable `Active` / `Inactive` |
 | `GpioRead(pin)` | `true` when `Switch` is pressed, else `false` |
-| `DelayUs(us)` | Wait at least that long (the driver uses 3 and 1000) |
+| `DelayUs(us)` | Wait at least that long (the driver uses 3, 10 and 1000) |
 
 All return `bool` except `EndTransaction()`, `GpioSet()` and `DelayUs()`, which return `void`.
 
@@ -57,23 +57,20 @@ The driver addresses pins by name and abstract level. Your port decides the phys
 | --- | --- | --- |
 | `ChipSelect` | `Inactive` at start | Low |
 | `DataCommand` | `Active` at start | High (data) |
-| `Reset` | `Inactive` 3 µs, then `Active` | **High**: see below |
+| `Reset` | `Active` 3 µs, then `Inactive` | Low (RES# held in reset) |
 | `VccEnable` | `Active` after reset | Supply on |
 | `Switch` | Read by `IsPressed()` | Pressed |
 
-!!! warning "Reset ends `Active`"
-    The header describes RES as an active-low pulse, but in this release `Initialize()` drives `Reset` to
-    `Inactive`, waits 3 µs and leaves it `Active`. A port that maps `Active` to low holds the controller in reset
-    after `Initialize()` returns `true`, and the screen stays dark. Map `Active` to high (as the port above does)
-    until the driver is fixed. The ESP32 example adapter maps it to low; see
-    [Troubleshooting](troubleshooting.md#screen-stays-dark-after-initialize-returns-true).
+`Reset` follows the other pins: `Active` is the asserted level, which for RES# is low. `Initialize()` drives it
+`Active` for at least 3 µs, then `Inactive` (high), and waits 10 µs before the first command (SSD1331 power-on
+sequence, reset completion 2 µs maximum).
 
 ## Reference implementation
 
 The ESP32 examples use [`esp32_isf15acp4_spi_adapter.hpp`](../examples/esp32/main/esp32_isf15acp4_spi_adapter.hpp):
 an ESP-IDF `spi_master` device in mode 0 with SS as a GPIO, `spi_device_polling_transmit()` for blocking writes,
 an input with pull-up for the switch and `esp_rom_delay_us()` / `vTaskDelay()` for delays. Start from it for any
-ESP-IDF target, with the reset mapping fixed as above.
+ESP-IDF target.
 
 ## Check your port
 

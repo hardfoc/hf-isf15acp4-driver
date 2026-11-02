@@ -42,9 +42,8 @@ control pins and waits. Replace the `platform_*` calls with your SDK's.
 --8<-- "tests/docs/my_spi.hpp:port"
 ```
 
-Map `CtrlPin::Reset` exactly as shown: in this release the driver ends its reset pulse with the pin `ACTIVE`, so
-`ACTIVE` must be the high, running level. [Porting](porting.md#control-pins) explains each method and the pin
-levels.
+`CtrlPin::Reset` is active low like SS: `Active` holds the controller in reset, `Inactive` lets it run.
+[Porting](porting.md#control-pins) explains each method and the pin levels.
 
 ## 4. Show something
 
@@ -68,7 +67,7 @@ This example is built by the host CI, so it compiles against the current headers
 | Symptom | First thing to check |
 | --- | --- |
 | `Initialize()` returns `false` | `GetLastError()`: your `EnsureInitialized()` or `WriteBytes()` failed |
-| Returns `true`, screen stays dark | RES ends low (pin mapping), VCC not at 14 V to 16 V, SS or D/C swapped |
+| Returns `true`, screen stays dark | RES ends low (`Reset` mapping inverted), VCC not at 14 V to 16 V, SS or D/C swapped |
 | Shapes in the right place, colours wrong | Byte order of the frame ([Troubleshooting](troubleshooting.md#colours-wrong-after-present)) |
 | Switch always pressed or never | Pull-up on the SW pin, active level in `GpioRead()` |
 

@@ -47,7 +47,7 @@ public:
      *
      * Sequence:
      * 1. Ensure SPI/GPIO ready
-     * 2. Hold RES low >= 3 us, then release
+     * 2. Assert Reset (RES# low) >= 3 us, release it (high), wait for reset completion
      * 3. Optionally enable VCC rail via VccEnable pin
      * 4. Transmit variant-specific initialization table
      * 5. Configure default memory window

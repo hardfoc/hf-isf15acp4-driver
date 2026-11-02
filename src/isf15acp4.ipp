@@ -51,10 +51,12 @@ void SmartDisplay<SpiType>::setError(Error e) noexcept {
 
 template <typename SpiType>
 void SmartDisplay<SpiType>::pulseReset() noexcept {
-    bus_->GpioSetInactive(CtrlPin::Reset);
-    bus_->DelayUs(ssd1331::kResetPulseMinUs);
+    // SSD1331 rev 1.2, section 7.9 and Table 18: hold RES# low (Reset asserted = Active) for at least 3 us, release
+    // it high (Inactive), then allow the reset completion time (2 us max) before the first command.
     bus_->GpioSetActive(CtrlPin::Reset);
-    bus_->DelayUs(10);
+    bus_->DelayUs(ssd1331::kResetPulseMinUs);
+    bus_->GpioSetInactive(CtrlPin::Reset);
+    bus_->DelayUs(ssd1331::kResetRecoveryUs);
 }
 
 template <typename SpiType>

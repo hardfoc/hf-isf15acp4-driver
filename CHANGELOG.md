@@ -6,6 +6,18 @@ code that used the affected API; together they call for a major version bump at 
 
 ## Unreleased
 
+### Breaking changes
+
+- **BREAKING** `CtrlPin::Reset` now means "held in reset": `Initialize()` drives it `Active` for at least 3 µs, then
+  `Inactive`, and leaves it `Inactive` (SSD1331 rev 1.2 section 7.9, Table 18). Map `Active` to the low RES# level,
+  like `ChipSelect`. Ports that followed the earlier workaround (`Active` = high) must invert their `Reset` mapping;
+  the ESP32 example adapter already maps it this way.
+
+### Fixed
+
+- The reset pulse left RES# low with an active-low port, so the controller stayed in reset. The driver now asserts
+  RES# for at least 3 µs, releases it and waits 10 µs (reset completion is 2 µs maximum) before the first command.
+
 ### Documentation
 
 - The documentation site moved to the HardFOC MkDocs platform: new page set (quickstart, hardware, architecture,

@@ -52,28 +52,45 @@ TEST_CASE("Every command and its parameters go in one CS-low transaction") {
   }
 }
 
-TEST_CASE("Reset pulse is at least 3 us, VCC is enabled after it") {
+TEST_CASE("Reset asserts RES# for at least 3 us, releases it, and waits before the first command") {
+  // SSD1331 rev 1.2 section 7.9 and Table 18: RES# low >= 3 us, then high; reset completes within 2 us.
   isf15acp4_test::MockSpi spi;
   Display display(&spi);
   REQUIRE(display.Initialize(true));
 
-  const isf15acp4_test::PinEvent* first_reset = nullptr;
-  const isf15acp4_test::PinEvent* second_reset = nullptr;
+  std::vector<isf15acp4_test::PinEvent> reset;
   const isf15acp4_test::PinEvent* vcc_on = nullptr;
   for (const auto& e : spi.pins) {
     if (e.pin == CtrlPin::Reset) {
-      (first_reset == nullptr ? first_reset : second_reset) = &e;
+      reset.push_back(e);
     }
     if (e.pin == CtrlPin::VccEnable && e.signal == GpioSignal::Active) {
       vcc_on = &e;
     }
   }
-  REQUIRE(first_reset != nullptr && second_reset != nullptr && vcc_on != nullptr);
-  // The driver drives Reset INACTIVE, waits, then ACTIVE and leaves it there (see the Porting page).
-  CHECK(first_reset->signal == GpioSignal::Inactive);
-  CHECK(second_reset->signal == GpioSignal::Active);
-  CHECK(second_reset->time_us - first_reset->time_us >= isf15acp4::ssd1331::kResetPulseMinUs);
-  CHECK(vcc_on->time_us >= second_reset->time_us);
+  REQUIRE(reset.size() == 2);
+  REQUIRE(vcc_on != nullptr);
+  CHECK(reset[0].signal == GpioSignal::Active);    // RES# low: chip held in reset
+  CHECK(reset[1].signal == GpioSignal::Inactive);  // RES# high: chip released and left running
+  CHECK(reset[1].time_us - reset[0].time_us >= isf15acp4::ssd1331::kResetPulseMinUs);
+  CHECK(vcc_on->time_us >= reset[0].time_us + 3);  // t2: VCC at least 3 us after RES# went low
+  CHECK(vcc_on->time_us >= reset[1].time_us + 2);  // after the reset completion time
+}
+
+TEST_CASE("Reset() leaves RES# released") {
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  REQUIRE(display.Initialize());
+  spi.clear();
+  REQUIRE(display.Reset());
+  const isf15acp4_test::PinEvent* last = nullptr;
+  for (const auto& e : spi.pins) {
+    if (e.pin == CtrlPin::Reset) {
+      last = &e;
+    }
+  }
+  REQUIRE(last != nullptr);
+  CHECK(last->signal == GpioSignal::Inactive);
 }
 
 TEST_CASE("Initialize(false) never enables VCC") {

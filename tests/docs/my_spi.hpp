@@ -46,7 +46,7 @@ public:
     switch (pin) {
       case isf15acp4::CtrlPin::ChipSelect:  platform_gpio_write(kCs, !active); break;   // SS active low
       case isf15acp4::CtrlPin::DataCommand: platform_gpio_write(kDc, active); break;    // high = data
-      case isf15acp4::CtrlPin::Reset:       platform_gpio_write(kRes, active); break;   // see Porting: ACTIVE = high
+      case isf15acp4::CtrlPin::Reset:       platform_gpio_write(kRes, !active); break;  // RES# active low
       case isf15acp4::CtrlPin::VccEnable:   platform_gpio_write(kVccEn, active); break;
       case isf15acp4::CtrlPin::Switch:      break;                                      // input only
     }

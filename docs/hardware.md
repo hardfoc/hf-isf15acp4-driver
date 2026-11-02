@@ -81,9 +81,10 @@ The datasheet's power on / off sequence:
 
 While VCC is off it sits near VDD through the controller's ESD protection; that is expected.
 
-`SmartDisplay::Initialize(true)` does steps 2 and 3: it drives `Reset` for 3 µs, sets `VccEnable` active, waits
-1 ms and sends the initialisation table. With `Initialize(false)` it leaves VCC alone, for boards that switch the
-supply themselves. The driver has no power-off call: send `DisplayOff()`, then drop `VccEnable` from your own code.
+`SmartDisplay::Initialize(true)` does steps 2 and 3: it holds `Reset` active (RES low) for 3 µs, releases it, waits
+10 µs, sets `VccEnable` active, waits 1 ms and sends the initialisation table. With `Initialize(false)` it leaves
+VCC alone, for boards that switch the supply themselves. The driver has no power-off call: send `DisplayOff()`,
+then drop `VccEnable` from your own code.
 
 ## Switch
 

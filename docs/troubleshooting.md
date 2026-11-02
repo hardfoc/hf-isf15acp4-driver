@@ -10,7 +10,7 @@ most questions in minutes.
 
 | Check | Fix |
 | --- | --- |
-| RES is low after `Initialize()` | Map `Reset` `Active` to high ([Porting](porting.md#control-pins)); the ESP32 example port needs this |
+| RES is low after `Initialize()` | Map `Reset` `Active` to low, `Inactive` to high ([Porting](porting.md#control-pins)) |
 | VCC (pin 9) is not 14 V to 16 V | `VccEnable` mapping, your supply's enable level, `Initialize(true)` |
 | D/C is high during the init table | `BeginCommand()` must set D/C low |
 | SS rises between an opcode and its parameters | One SS-low transaction per Begin / End pair |

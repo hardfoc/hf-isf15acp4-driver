@@ -20,7 +20,7 @@ namespace isf15acp4 {
 enum class CtrlPin : uint8_t {
     ChipSelect = 0,   ///< SS / slave select (active-low on device)
     DataCommand = 1,  ///< D/C: command (inactive) vs data (active)
-    Reset = 2,        ///< RES reset input (active-low pulse)
+    Reset = 2,        ///< RES# reset input: Active = held in reset (pin low), Inactive = running (pin high)
     VccEnable = 3,    ///< Optional charge-pump / 16V rail enable
     Switch = 4        ///< Optional momentary switch sense input
 };
