@@ -1,7 +1,0 @@
-<map id="inc/isf15acp4_font.hpp" name="inc/isf15acp4_font.hpp">
-<area shape="rect" id="Node000001" title="Compact 5x7 bitmap font for SmartDisplay text rendering." alt="" coords="5,5,174,33"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="10,81,79,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,32,62,69,58,66,79,35"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="104,81,169,109"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="99,31,123,68,117,68,97,36"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="isf15acp4::SmartDisplay&lt; SpiType &gt;" name="isf15acp4::SmartDisplay&lt; SpiType &gt;">
-<area shape="rect" id="Node000001" title="High&#45;level driver for NKK SSD1331&#45;based SmartDisplay modules." alt="" coords="263,98,444,143"/>
-<area shape="rect" id="Node000002" href="$structisf15acp4_1_1SmartDisplayConfig.html" title="Configuration for SmartDisplay construction." alt="" coords="5,5,227,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,37,303,96,299,99,161,42"/>
-<area shape="rect" id="Node000003" href="$structisf15acp4_1_1DisplayGeometry.html" title="Compile&#45;time display geometry for a product variant." alt="" coords="250,5,456,33"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="355,47,356,99,351,96,351,50"/>
-<area shape="rect" id="Node000004" href="$structisf15acp4_1_1Rect.html" title="Axis&#45;aligned rectangle in display coordinates (inclusive bounds)." alt="" coords="481,5,602,33"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="505,40,396,100,394,95,500,41"/>
-</map>

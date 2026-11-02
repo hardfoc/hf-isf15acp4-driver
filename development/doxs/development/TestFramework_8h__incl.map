@@ -1,7 +1,0 @@
-<map id="examples/esp32/main/TestFramework.h" name="examples/esp32/main/TestFramework.h">
-<area shape="rect" id="Node000001" title="Lightweight test harness for ISF15ACP4 ESP32 driver examples." alt="" coords="14,5,179,50"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,98,89,126"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,49,65,86,61,83,81,52"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="113,98,178,126"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="111,48,133,85,127,84,108,53"/>
-</map>
