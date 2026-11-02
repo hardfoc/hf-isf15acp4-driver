@@ -1,10 +1,3 @@
----
-layout: default
-title: Troubleshooting
-parent: Documentation
-nav_order: 7
----
-
 # Troubleshooting
 
 ## Blank display after init

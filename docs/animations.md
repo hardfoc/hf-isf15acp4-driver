@@ -1,9 +1,3 @@
----
-layout: default
-title: Animations
-parent: Documentation
-nav_order: 32
----
 # Animations & Visual Examples
 
 The ISF15ACP4 is ideal for compact animated UIs. This driver includes procedural animations, example apps, and tools for custom artwork.

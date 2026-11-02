@@ -1,9 +1,3 @@
----
-layout: default
-title: Getting Started
-parent: Documentation
-nav_order: 11
----
 # Getting Started with ISF15ACP4
 
 The ISF15ACP4 combines a **96×64 color OLED** and a **momentary pushbutton** in one through-hole package — perfect as a compact "do something" control for motors, scripts, test rigs, and panel UIs.

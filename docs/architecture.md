@@ -1,9 +1,3 @@
----
-layout: default
-title: Architecture
-parent: Documentation
-nav_order: 20
----
 # Architecture
 
 The HF-ISF15ACP4 driver is organized as a layered, MCU-agnostic stack. Each layer has a single responsibility and can be replaced without rewriting application logic.

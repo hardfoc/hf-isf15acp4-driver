@@ -1,9 +1,3 @@
----
-layout: default
-title: Platform Integration
-parent: Documentation
-nav_order: 13
----
 # Platform Integration
 
 ![ESP32 wiring reference](assets/isf15acp4-wiring-esp32.png)

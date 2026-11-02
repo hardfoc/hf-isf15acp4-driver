@@ -1,10 +1,3 @@
----
-layout: default
-title: Datasheet
-parent: Documentation
-nav_order: 50
----
-
 # Datasheet & Manufacturer Resources
 
 Official documentation for the NKK ISF15ACP4 SmartDisplay family.

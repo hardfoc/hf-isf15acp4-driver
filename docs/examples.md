@@ -1,10 +1,3 @@
----
-layout: default
-title: Examples
-parent: Documentation
-nav_order: 5
----
-
 # Examples
 
 ESP32 applications live under `examples/esp32/`. Build orchestration uses `hf-espidf-project-tools` (`app_config.yml` matrix).

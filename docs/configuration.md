@@ -1,10 +1,3 @@
----
-layout: default
-title: Configuration
-parent: Documentation
-nav_order: 3
----
-
 # Configuration
 
 ## CMake options (standalone driver)

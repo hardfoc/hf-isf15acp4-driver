@@ -1,9 +1,3 @@
----
-layout: default
-title: Hardware Notes
-parent: Documentation
-nav_order: 22
----
 # Hardware Notes
 
 > **Primary reference:** See [Hardware Setup](hardware_setup.md) for pinout, power sequencing, wiring, and supported product variants.

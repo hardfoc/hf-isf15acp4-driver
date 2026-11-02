@@ -1,9 +1,3 @@
----
-layout: default
-title: Graphics Engines
-parent: Documentation
-nav_order: 30
----
 # Graphics Engines
 
 The driver ships **three interchangeable graphics backends**. Select at `SmartDisplay` construction — the same drawing API works throughout your application.

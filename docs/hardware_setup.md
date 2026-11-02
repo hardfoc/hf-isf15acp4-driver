@@ -1,10 +1,3 @@
----
-layout: default
-title: Hardware Setup
-parent: Documentation
-nav_order: 6
----
-
 # Hardware Setup
 
 > **Supplemental notes:** See [Hardware Notes](hardware.md) for additional electrical context.

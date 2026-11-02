@@ -1,10 +1,3 @@
----
-layout: default
-title: CMake Integration
-parent: Documentation
-nav_order: 4
----
-
 # CMake Integration
 
 ## Standalone `find_package`

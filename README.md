@@ -1,11 +1,3 @@
----
-layout: default
-title: "HardFOC ISF15ACP4 Driver"
-description: "MCU-agnostic C++ driver for the NKK ISF15ACP4 96×64 SmartDisplay OLED pushbutton"
-nav_order: 1
-permalink: /
----
-
 # HF-ISF15ACP4 Driver
 
 **The complete MCU-agnostic driver for the [NKK ISF15ACP4](https://www.nkkswitches.com/wp-content/themes/impress-blank/search/inc/part.php?part_no=ISF15ACP4) — a 96×64 RGB OLED pushbutton with integrated momentary switch.**

@@ -1,9 +1,3 @@
----
-layout: default
-title: Quick Start
-parent: Documentation
-nav_order: 10
----
 # Quick Start
 
 Get the ISF15ACP4 SmartDisplay running in minutes.

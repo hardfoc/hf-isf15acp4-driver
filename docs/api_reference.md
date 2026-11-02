@@ -1,9 +1,3 @@
----
-layout: default
-title: API Reference
-parent: Documentation
-nav_order: 40
----
 # API Reference
 
 ## Namespace `isf15acp4`

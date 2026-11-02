@@ -1,9 +1,3 @@
----
-layout: default
-title: Graphics Guide
-parent: Documentation
-nav_order: 31
----
 # Graphics Guide
 
 > For backend selection and animation APIs, see [Graphics Engines](graphics_engines.md) and [Animations](animations.md).

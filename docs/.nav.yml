@@ -1,0 +1,20 @@
+---
+# Site navigation (mkdocs-awesome-nav): the tabs and sidebar, in this order.
+nav:
+  - Home: index.md
+  - "Configuration": configuration.md
+  - "CMake Integration": cmake_integration.md
+  - "Examples": examples.md
+  - "Hardware Setup": hardware_setup.md
+  - "Troubleshooting": troubleshooting.md
+  - "Quick Start": quickstart.md
+  - "Getting Started": getting_started.md
+  - "Installation": installation.md
+  - "Platform Integration": platform_integration.md
+  - "Architecture": architecture.md
+  - "Hardware Notes": hardware.md
+  - "Graphics Engines": graphics_engines.md
+  - "Graphics Guide": graphics.md
+  - "Animations": animations.md
+  - "API Reference": api_reference.md
+  - "Datasheet": datasheet/index.md

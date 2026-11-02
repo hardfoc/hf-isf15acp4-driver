@@ -1,9 +1,3 @@
----
-layout: default
-title: Installation
-parent: Documentation
-nav_order: 12
----
 # Installation
 
 ## CMake (recommended)

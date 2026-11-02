@@ -1,10 +1,3 @@
----
-layout: default
-title: Documentation
-nav_order: 2
-has_children: true
----
-
 # Documentation Index
 
 Welcome to the HF-ISF15ACP4 driver documentation.
