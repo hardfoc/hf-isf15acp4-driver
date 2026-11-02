@@ -20,8 +20,6 @@ env:
 
 permissions:
   contents: read
-  pull-requests: write
-  actions: read
 
 concurrency:
   group: esp32-build-ci-${{ github.ref }}
@@ -60,6 +58,9 @@ jobs:
   build:
     needs: validate
     uses: hardfoc/hf-espidf-ci-tools/.github/workflows/ru-build.yml@v1
+    permissions:
+      contents: read
+      pull-requests: write
     with:
       project_dir: ${{ needs.validate.outputs.project_dir }}
       project_tools_dir: ${{ needs.validate.outputs.tools_dir }}
@@ -67,6 +68,9 @@ jobs:
 
   lint:
     uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-cpp-lint.yml@v1
+    permissions:
+      contents: read
+      pull-requests: write
     with:
       clang_version: "20"
       clang_format_config: "_config/.clang-format"
