@@ -76,8 +76,9 @@ These draw straight into the display RAM. A later `Present()` overwrites them wi
 ```
 
 `SetWindow()` takes inclusive bounds and returns `false` with `Error::OutOfRange` outside 0..95, 0..63.
-`WritePixels()` needs an even byte count and `Initialize()` first. Send each pixel high byte first, which is the
-SSD1331's 65k-colour order. Restore the full window before the next `Present()`; `DrawCanvas()` and `Present()`
+`WriteColors()` needs `Initialize()` first and sends each `Color565` pixel high byte first, the SSD1331's
+65k-colour order. `WritePixels()` sends raw bytes unchanged, two per pixel already in that format, and needs an even
+byte count. Restore the full window before the next `Present()`; `DrawCanvas()` and `Present()`
 set it themselves.
 
 ## Brightness and power

@@ -66,16 +66,15 @@ bool hardware_draw(Display& display) {
 
 bool raw_pixels(Display& display) {
   // --8<-- [start:raw]
-  // An 8 x 8 red square at (40, 28): window, then 64 pixels high byte first.
-  uint8_t block[8 * 8 * 2];
-  for (std::size_t i = 0; i < sizeof(block); i += 2) {
-    block[i] = static_cast<uint8_t>(colors::Red >> 8);
-    block[i + 1] = static_cast<uint8_t>(colors::Red & 0xFF);
+  // An 8 x 8 red square at (40, 28): window, then 64 pixels.
+  isf15acp4::Color565 block[8 * 8];
+  for (auto& px : block) {
+    px = colors::Red;
   }
   if (!display.SetWindow({40, 28, 47, 35})) {   // 15h / 75h, inclusive bounds
     return false;
   }
-  if (!display.WritePixels(block, sizeof(block))) {
+  if (!display.WriteColors(block, 8 * 8)) {     // high byte first on any CPU
     return false;
   }
   return display.SetFullWindow();               // back to 96 x 64 for Present()

@@ -12,11 +12,22 @@ code that used the affected API; together they call for a major version bump at 
   `Inactive`, and leaves it `Inactive` (SSD1331 rev 1.2 section 7.9, Table 18). Map `Active` to the low RES# level,
   like `ChipSelect`. Ports that followed the earlier workaround (`Active` = high) must invert their `Reset` mapping;
   the ESP32 example adapter already maps it this way.
+- **BREAKING** `Present()`, `DrawCanvas()` and `FillScreen()` now send each pixel high byte first on every CPU
+  (SSD1331 rev 1.2 section 7.5.2, Table 9). Remove any byte swap added around `Present()` as a workaround, or it
+  swaps the frame back.
+
+### Added
+
+- `SmartDisplay::WriteColors(colors, count)` streams `Color565` pixels in the controller's byte order.
+  `WritePixels()` still sends raw bytes unchanged.
 
 ### Fixed
 
 - The reset pulse left RES# low with an active-low port, so the controller stayed in reset. The driver now asserts
   RES# for at least 3 µs, releases it and waits 10 µs (reset completion is 2 µs maximum) before the first command.
+- Frames went out in memory order, low byte first on little-endian MCUs (ESP32, Arm Cortex-M, x86), so colours
+  were wrong after `Present()`. The canvas upload and the hardware-direct flush hook now serialise each pixel high
+  byte first.
 
 ### Documentation
 

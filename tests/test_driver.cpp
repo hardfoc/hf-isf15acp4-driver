@@ -194,6 +194,42 @@ TEST_CASE("Present uploads the whole 12288-byte frame") {
   CHECK_EQ(spi.transactions.back().bytes.size(), std::size_t{12288});
 }
 
+TEST_CASE("Present sends every pixel high byte first, whatever the CPU byte order") {
+  // SSD1331 rev 1.2 section 7.5.2, Table 9: in 65k colour the first byte of a pixel is its high byte.
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  REQUIRE(display.Initialize());
+  auto gfx = display.CreateGraphicsContext();
+  gfx.Clear(isf15acp4::colors::White);
+  gfx.SetPixel(0, 0, 0xFFE0);   // first pixel in the frame
+  gfx.SetPixel(95, 63, 0xFFE0);  // last pixel
+  spi.clear();
+  REQUIRE(display.Present(gfx));
+  const auto& frame = spi.transactions.back().bytes;
+  REQUIRE(frame.size() == 12288);
+  CHECK(frame[0] == 0xFF);
+  CHECK(frame[1] == 0xE0);
+  CHECK(frame[12286] == 0xFF);
+  CHECK(frame[12287] == 0xE0);
+  CHECK_EQ(spi.open_transactions, 0);
+}
+
+TEST_CASE("WriteColors needs Initialize() and a buffer, and uses one data transaction") {
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  const isf15acp4::Color565 px[3] = {0xFFE0, 0x07FF, 0xFFFF};
+  CHECK(!display.WriteColors(px, 3));
+  CHECK(display.HasError(isf15acp4::Error::NotInitialized));
+  REQUIRE(display.Initialize());
+  CHECK(!display.WriteColors(nullptr, 3));
+  CHECK(!display.WriteColors(px, 0));
+  spi.clear();
+  REQUIRE(display.WriteColors(px, 3));
+  REQUIRE(spi.transactions.size() == 1);
+  CHECK(spi.transactions[0].data);
+  CHECK(spi.transactions[0].bytes == bytes({0xFF, 0xE0, 0x07, 0xFF, 0xFF, 0xFF}));
+}
+
 TEST_CASE("IsPressed reads the Switch pin through the port") {
   isf15acp4_test::MockSpi spi;
   Display display(&spi);

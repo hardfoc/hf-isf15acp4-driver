@@ -88,11 +88,26 @@ public:
     bool SetFullWindow() noexcept;
 
     /**
-     * @brief Stream RGB565 pixels to the controller GRAM.
+     * @brief Stream raw pixel bytes to the controller GRAM, unchanged.
+     *
+     * The bytes must already be in the controller's 65k-colour format: two bytes per pixel, high byte first.
+     * For Color565 buffers use WriteColors().
+     *
      * @param data Pixel buffer (two bytes per pixel).
      * @param byte_len Number of bytes (must be even).
      */
     bool WritePixels(const uint8_t* data, std::size_t byte_len) noexcept;
+
+    /**
+     * @brief Stream Color565 pixels to the controller GRAM in the SSD1331 65k-colour byte order.
+     *
+     * Each pixel goes out high byte first (SSD1331 rev 1.2 section 7.5.2, Table 9), whatever the CPU's byte order,
+     * in one data transaction. Use this instead of WritePixels() for Color565 buffers.
+     *
+     * @param colors Pixel buffer.
+     * @param count Number of pixels (not bytes).
+     */
+    bool WriteColors(const Color565* colors, std::size_t count) noexcept;
 
     /** @brief Upload an entire canvas framebuffer. */
     bool DrawCanvas(const Canvas& canvas) noexcept;

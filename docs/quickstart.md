@@ -68,7 +68,7 @@ This example is built by the host CI, so it compiles against the current headers
 | --- | --- |
 | `Initialize()` returns `false` | `GetLastError()`: your `EnsureInitialized()` or `WriteBytes()` failed |
 | Returns `true`, screen stays dark | RES ends low (`Reset` mapping inverted), VCC not at 14 V to 16 V, SS or D/C swapped |
-| Shapes in the right place, colours wrong | Byte order of the frame ([Troubleshooting](troubleshooting.md#colours-wrong-after-present)) |
+| Shapes in the right place, colours wrong | A leftover byte swap or raw `WritePixels()` bytes ([Troubleshooting](troubleshooting.md#colours-wrong-after-present)) |
 | Switch always pressed or never | Pull-up on the SW pin, active level in `GpioRead()` |
 
 ## Next

@@ -42,8 +42,8 @@ All return `bool` except `EndTransaction()`, `GpioSet()` and `DelayUs()`, which 
 Rules the transfer must follow:
 
 - **SPI mode 0** (mode 3 also meets the datasheet), MSB first, at most 6.6 MHz.
-- **One SS-low transaction per Begin / End pair.** The driver calls `WriteBytes()` once or twice inside it (the
-  opcode, then its parameters); keep SS low across both.
+- **One SS-low transaction per Begin / End pair.** The driver calls `WriteBytes()` one or more times inside it (a
+  command's opcode, then its parameters; a frame in chunks of up to 128 bytes); keep SS low across all of them.
 - **Blocking writes.** `WriteBytes()` must not return while bytes are still queued: `EndTransaction()` raises SS
   right after it, and the display drops a byte cut short. With DMA, wait for completion.
 - **No MISO.** The display has no data output; leave MISO unconnected or free for other devices.

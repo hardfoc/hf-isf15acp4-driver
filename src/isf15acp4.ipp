@@ -27,8 +27,7 @@ bool presenterFillScreen(void* ctx, Color565 color) noexcept {
 
 template <typename SpiType>
 bool presenterFlushCanvas(void* ctx, const Color565* data, std::size_t bytes) noexcept {
-    return static_cast<SmartDisplay<SpiType>*>(ctx)->WritePixels(
-        reinterpret_cast<const uint8_t*>(data), bytes);
+    return static_cast<SmartDisplay<SpiType>*>(ctx)->WriteColors(data, bytes / sizeof(Color565));
 }
 
 }  // namespace detail
@@ -232,6 +231,47 @@ bool SmartDisplay<SpiType>::WritePixels(const uint8_t* data, std::size_t byte_le
 }
 
 template <typename SpiType>
+bool SmartDisplay<SpiType>::WriteColors(const Color565* colors, std::size_t count) noexcept {
+    if (!initialized_) {
+        setError(Error::NotInitialized);
+        return false;
+    }
+    if (colors == nullptr || count == 0) {
+        setError(Error::InvalidParam);
+        return false;
+    }
+
+    if (!bus_->BeginData()) {
+        setError(Error::SpiWrite);
+        return false;
+    }
+
+    // SSD1331 rev 1.2 section 7.5.2, Table 9 (65k colour, 8-bit interface): first byte C4..C0 B5..B3, second byte
+    // B2..B0 A4..A0, i.e. the 16-bit pixel high byte first. Serialise explicitly so the CPU's byte order does not
+    // matter, in chunks inside one data transaction.
+    constexpr std::size_t kChunkPixels = 64;
+    uint8_t chunk[kChunkPixels * 2];
+    std::size_t done = 0;
+    while (done < count) {
+        const std::size_t n = (count - done) < kChunkPixels ? (count - done) : kChunkPixels;
+        for (std::size_t i = 0; i < n; ++i) {
+            const Color565 c = colors[done + i];
+            chunk[2 * i] = static_cast<uint8_t>(c >> 8);
+            chunk[2 * i + 1] = static_cast<uint8_t>(c & 0xFF);
+        }
+        if (!bus_->WriteBytes(chunk, n * 2)) {
+            bus_->EndTransaction();
+            setError(Error::SpiWrite);
+            return false;
+        }
+        done += n;
+    }
+
+    bus_->EndTransaction();
+    return true;
+}
+
+template <typename SpiType>
 bool SmartDisplay<SpiType>::DrawCanvas(const Canvas& canvas) noexcept {
     if (canvas.Width() != geometry_.width || canvas.Height() != geometry_.height) {
         setError(Error::InvalidParam);
@@ -240,7 +280,7 @@ bool SmartDisplay<SpiType>::DrawCanvas(const Canvas& canvas) noexcept {
     if (!SetFullWindow()) {
         return false;
     }
-    return WritePixels(reinterpret_cast<const uint8_t*>(canvas.Data()), canvas.ByteSize());
+    return WriteColors(canvas.Data(), canvas.ByteSize() / sizeof(Color565));
 }
 
 template <typename SpiType>

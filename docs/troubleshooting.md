@@ -36,10 +36,12 @@ release `SetWindow()` rejects the full window as wider than the panel. Only `Isf
 
 ## Colours wrong after `Present()`
 
-Shapes and text are in the right place but the colours are not, while `DrawPixel()`, `DrawLine()` and
-`FillScreen(colors::White)` look right: the frame went out low byte first. The SSD1331 takes each pixel high byte
-first, and `Present()` sends the canvas in memory order, which is low byte first on ESP32, Arm Cortex-M and x86.
-Swap the bytes around the upload ([Graphics](graphics.md#colours)).
+Shapes and text are in the right place but the colours are not. The driver sends each pixel high byte first on
+any CPU, so check your own code:
+
+- Remove any byte swap added around `Present()` for earlier releases: it now swaps the frame back.
+- `WritePixels()` sends your bytes unchanged. For `Color565` buffers use `WriteColors()`
+  ([API guide](api-guide.md#write-pixels-yourself)).
 
 ## Red and blue swapped in hardware shapes
 

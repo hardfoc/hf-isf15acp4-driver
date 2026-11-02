@@ -63,13 +63,9 @@ Colours are `Color565`: 16-bit RGB565, red in bits 15 to 11, green 10 to 5, blue
 
 The presets are `Black`, `White`, `Red`, `Green`, `Blue`, `Yellow`, `Cyan`, `Magenta`, `Orange` and `Gray`.
 
-The SSD1331 takes each pixel as two bytes, high byte first. `DrawPixel()` and the hardware commands send that
-order; `Present()` sends the frame as it is in memory, which is the other way round on little-endian MCUs. If
-colours come out wrong after `Present()`, swap the bytes around the upload:
-
-```cpp
---8<-- "tests/docs/graphics.cpp:byte-order"
-```
+The SSD1331 takes each pixel as two bytes, high byte first (65k-colour format, SSD1331 datasheet Table 9).
+`Present()`, `DrawCanvas()`, `FillScreen()`, `DrawPixel()` and `WriteColors()` send that order on any CPU, so the
+canvas stays in native byte order and needs no swapping.
 
 ## Text
 
