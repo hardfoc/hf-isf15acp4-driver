@@ -162,9 +162,26 @@ public:
      */
     [[nodiscard]] bool IsPressed() const noexcept;
 
-    /** @brief Enable/disable hardware scrolling (commands 27H/2FH/2EH). */
+    /**
+     * @brief Set up hardware scrolling and optionally start it.
+     *
+     * Always stops scrolling first (2EH), then sends the setup (27H) and, when @p activate is true, starts it
+     * (2FH): the SSD1331 must not get new scroll parameters while scrolling runs (rev 1.2 Table 10, 27H note 2).
+     * With @p activate false the scroll stays stopped; rewrite the display RAM afterwards (see StopScroll()).
+     */
     bool ConfigureScroll(uint8_t h_offset, uint8_t start_row, uint8_t scroll_rows,
                          uint8_t v_offset, uint8_t interval_code, bool activate) noexcept;
+
+    /**
+     * @brief Stop hardware scrolling (2EH).
+     *
+     * The display RAM stays shifted: the SSD1331 needs it rewritten after 2EH (rev 1.2 Table 10). Prefer
+     * StopScroll(const GraphicsContext&), or redraw yourself.
+     */
+    bool StopScroll() noexcept;
+
+    /** @brief Stop hardware scrolling (2EH), then rewrite the display RAM with Present(@p gfx). */
+    bool StopScroll(const GraphicsContext& gfx) noexcept;
 
     [[nodiscard]] uint16_t GetErrorFlags() const noexcept { return error_flags_; }
     [[nodiscard]] bool HasError(Error e) const noexcept {

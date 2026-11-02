@@ -398,13 +398,34 @@ template <typename SpiType>
 bool SmartDisplay<SpiType>::ConfigureScroll(uint8_t h_offset, uint8_t start_row, uint8_t scroll_rows,
                                             uint8_t v_offset, uint8_t interval_code,
                                             bool activate) noexcept {
+    // SSD1331 rev 1.2 Table 10, 27h note 2: the parameters must not change while scrolling is active, so stop
+    // first (NKK Application Notes rev H section 12: send 27h only with scrolling deactivated).
+    if (!StopScroll()) {
+        return false;
+    }
     const uint8_t data[5] = {h_offset, start_row, scroll_rows, v_offset,
                               static_cast<uint8_t>(interval_code & 0x03)};
     if (!sendCommand(static_cast<uint8_t>(ssd1331::Command::ScrollSetup), data, sizeof(data))) {
         return false;
     }
-    return sendCommandOnly(activate ? static_cast<uint8_t>(ssd1331::Command::ActivateScroll)
-                                    : static_cast<uint8_t>(ssd1331::Command::DeactivateScroll));
+    if (!activate) {
+        return true;
+    }
+    return sendCommandOnly(static_cast<uint8_t>(ssd1331::Command::ActivateScroll));
+}
+
+template <typename SpiType>
+bool SmartDisplay<SpiType>::StopScroll() noexcept {
+    return sendCommandOnly(static_cast<uint8_t>(ssd1331::Command::DeactivateScroll));
+}
+
+template <typename SpiType>
+bool SmartDisplay<SpiType>::StopScroll(const GraphicsContext& gfx) noexcept {
+    // SSD1331 rev 1.2 Table 10, 2Eh note: after deactivating, the RAM data needs to be rewritten.
+    if (!StopScroll()) {
+        return false;
+    }
+    return Present(gfx);
 }
 
 }  // namespace isf15acp4

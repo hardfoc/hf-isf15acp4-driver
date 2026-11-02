@@ -74,7 +74,7 @@ blue in one kind of drawing only, check:
 | Symptom | Cause and fix |
 | --- | --- |
 | Uneven brightness after months | Busy pixels age faster: move static screens, lower the master current, turn off when idle |
-| Old content after scrolling stops | The SSD1331 needs its RAM rewritten: `Present()` after `ConfigureScroll(..., false)` |
+| Old content after scrolling stops | The SSD1331 needs its RAM rewritten: stop with `StopScroll(gfx)`, or `Present()` after `StopScroll()` |
 | Hardware shapes disappear | `Present()` overwrote them: draw everything in the canvas |
 
 ## ESP32 example does not build

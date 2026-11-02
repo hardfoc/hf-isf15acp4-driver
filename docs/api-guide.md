@@ -106,10 +106,12 @@ Lower brightness also slows the OLED's ageing. `SetMasterCurrent()` rejects valu
 --8<-- "tests/docs/api_tasks.cpp:scroll"
 ```
 
-`ConfigureScroll(h_offset, start_row, rows, v_offset, interval, activate)` sends the SSD1331 scroll setup (`27h`)
-and then starts (`2Fh`) or stops (`2Eh`) scrolling. The interval code is 0 to 3: a step every 6, 10, 100 or 200
-frames. The SSD1331 datasheet says not to change the scroll parameters while scrolling runs, and to rewrite the
-display RAM after stopping it: call `Present()` (or redraw) after `ConfigureScroll(..., false)`.
+`ConfigureScroll(h_offset, start_row, rows, v_offset, interval, activate)` stops any running scroll (`2Eh`), sends
+the SSD1331 scroll setup (`27h`) and, with `activate`, starts it (`2Fh`): the datasheet forbids changing the
+parameters while scrolling runs. The interval code is 0 to 3: a step every 6, 10, 100 or 200 frames.
+
+Stopping leaves the display RAM shifted, and the datasheet says to rewrite it: `StopScroll(gfx)` sends `2Eh` and
+then `Present(gfx)`. `StopScroll()` without a context only sends `2Eh`; redraw yourself afterwards.
 
 ## Read the switch
 

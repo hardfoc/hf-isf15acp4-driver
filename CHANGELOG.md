@@ -24,6 +24,8 @@ code that used the affected API; together they call for a major version bump at 
 
 - `SmartDisplay::WriteColors(colors, count)` streams `Color565` pixels in the controller's byte order.
   `WritePixels()` still sends raw bytes unchanged.
+- `SmartDisplay::StopScroll()` stops hardware scrolling (`2Eh`); `StopScroll(gfx)` also rewrites the display RAM
+  with `Present(gfx)`, as the SSD1331 requires after `2Eh`.
 - `ssd1331::ToPanelPixel(color)` converts a `Color565` to the panel's pixel word.
 
 ### Fixed
@@ -43,6 +45,9 @@ code that used the affected API; together they call for a major version bump at 
 - With `GraphicsBackend::HardwareDirect`, `Initialize()` bound the display to a temporary context, so contexts
   from `CreateGraphicsContext()` drew into RAM and nothing reached the panel. `CreateGraphicsContext()` on a
   non-const display now returns a bound context; a `const` display still returns an unbound one.
+- `ConfigureScroll()` sent new `27h` parameters while scrolling could be running, and with `activate = false` sent
+  `27h` before `2Eh`. It now always sends `2Eh` first, then `27h`, then `2Fh` only when activating (SSD1331 rev 1.2
+  Table 10, `27h` note 2).
 
 ### Documentation
 

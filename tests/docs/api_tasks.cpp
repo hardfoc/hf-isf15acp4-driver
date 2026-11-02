@@ -81,10 +81,14 @@ bool raw_pixels(Display& display) {
   // --8<-- [end:raw]
 }
 
-bool scroll(Display& display) {
+bool scroll(Display& display, const isf15acp4::GraphicsContext& gfx) {
   // --8<-- [start:scroll]
   // Horizontal scroll of all 64 rows by 1 column, no vertical offset, fastest interval (code 0).
-  return display.ConfigureScroll(1, 0, 64, 0, 0, true);  // 27h, then 2Fh; false sends 2Eh
+  if (!display.ConfigureScroll(1, 0, 64, 0, 0, true)) {  // 2Eh, 27h, then 2Fh
+    return false;
+  }
+  // ... later: stop, and rewrite the display RAM from the frame.
+  return display.StopScroll(gfx);                        // 2Eh, then Present(gfx)
   // --8<-- [end:scroll]
 }
 

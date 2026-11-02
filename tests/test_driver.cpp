@@ -320,6 +320,36 @@ TEST_CASE("A HardwareDirect context from CreateGraphicsContext() draws on the di
   CHECK(!spi.transactions.empty());
 }
 
+TEST_CASE("ConfigureScroll stops scrolling before 27h, StopScroll rewrites the RAM") {
+  // SSD1331 rev 1.2 Table 10: 27h parameters must not change while scrolling is active; after 2Eh the RAM must be
+  // rewritten. NKK Application Notes rev H section 12 / Table 7.
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  REQUIRE(display.Initialize());
+  spi.clear();
+  REQUIRE(display.ConfigureScroll(1, 0, 64, 0, 0, true));
+  auto cmds = spi.commands();
+  REQUIRE(cmds.size() == 3);
+  CHECK(cmds[0] == bytes({0x2E}));
+  CHECK(cmds[1] == bytes({0x27, 1, 0, 64, 0, 0}));
+  CHECK(cmds[2] == bytes({0x2F}));
+
+  spi.clear();
+  REQUIRE(display.ConfigureScroll(2, 0, 64, 0, 1, false));
+  cmds = spi.commands();
+  REQUIRE(cmds.size() == 2);
+  CHECK(cmds[0] == bytes({0x2E}));
+  CHECK(cmds[1] == bytes({0x27, 2, 0, 64, 0, 1}));
+
+  auto gfx = display.CreateGraphicsContext();
+  spi.clear();
+  REQUIRE(display.StopScroll(gfx));
+  REQUIRE(!spi.transactions.empty());
+  CHECK(spi.transactions.front().bytes == bytes({0x2E}));
+  CHECK(spi.transactions.back().data);
+  CHECK_EQ(spi.transactions.back().bytes.size(), std::size_t{12288});
+}
+
 TEST_CASE("IsPressed reads the Switch pin through the port") {
   isf15acp4_test::MockSpi spi;
   Display display(&spi);
