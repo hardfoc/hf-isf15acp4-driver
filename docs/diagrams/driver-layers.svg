@@ -38,24 +38,28 @@
 <text x="859.2" y="341.5" font-size="16" font-weight="700" fill="#3730A3">SetFullWindow()</text>
 <rect x="1013.3" y="323.4" width="123.8" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
 <text x="1021.3" y="341.5" font-size="16" font-weight="700" fill="#3730A3">WritePixels()</text>
-<rect x="48" y="357.4" width="134.7" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
-<text x="56" y="375.5" font-size="16" font-weight="700" fill="#3730A3">DrawCanvas()</text>
-<rect x="190.7" y="357.4" width="93.2" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
-<text x="198.7" y="375.5" font-size="16" font-weight="700" fill="#3730A3">Present()</text>
-<rect x="291.8" y="357.4" width="112.3" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
-<text x="299.8" y="375.5" font-size="16" font-weight="700" fill="#3730A3">DrawPixel()</text>
-<rect x="412.2" y="357.4" width="111.3" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
-<text x="420.2" y="375.5" font-size="16" font-weight="700" fill="#3730A3">FillScreen()</text>
-<rect x="531.4" y="357.4" width="107.1" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
-<text x="539.4" y="375.5" font-size="16" font-weight="700" fill="#3730A3">DrawLine()</text>
-<rect x="646.5" y="357.4" width="155.5" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
-<text x="654.5" y="375.5" font-size="16" font-weight="700" fill="#3730A3">DrawRectangle()</text>
-<rect x="810" y="357.4" width="141" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
-<text x="818" y="375.5" font-size="16" font-weight="700" fill="#3730A3">ClearWindow()</text>
-<rect x="959" y="357.4" width="110.8" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
-<text x="967" y="375.5" font-size="16" font-weight="700" fill="#3730A3">IsPressed()</text>
-<rect x="48" y="391.4" width="159.5" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
-<text x="56" y="409.5" font-size="16" font-weight="700" fill="#3730A3">ConfigureScroll()</text>
+<rect x="48" y="357.4" width="128.6" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="56" y="375.5" font-size="16" font-weight="700" fill="#3730A3">WriteColors()</text>
+<rect x="184.6" y="357.4" width="134.7" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="192.6" y="375.5" font-size="16" font-weight="700" fill="#3730A3">DrawCanvas()</text>
+<rect x="327.2" y="357.4" width="93.2" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="335.2" y="375.5" font-size="16" font-weight="700" fill="#3730A3">Present()</text>
+<rect x="428.4" y="357.4" width="112.3" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="436.4" y="375.5" font-size="16" font-weight="700" fill="#3730A3">DrawPixel()</text>
+<rect x="548.7" y="357.4" width="111.3" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="556.7" y="375.5" font-size="16" font-weight="700" fill="#3730A3">FillScreen()</text>
+<rect x="668" y="357.4" width="107.1" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="676" y="375.5" font-size="16" font-weight="700" fill="#3730A3">DrawLine()</text>
+<rect x="783.1" y="357.4" width="155.5" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="791.1" y="375.5" font-size="16" font-weight="700" fill="#3730A3">DrawRectangle()</text>
+<rect x="946.5" y="357.4" width="141" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="954.5" y="375.5" font-size="16" font-weight="700" fill="#3730A3">ClearWindow()</text>
+<rect x="48" y="391.4" width="110.8" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="56" y="409.5" font-size="16" font-weight="700" fill="#3730A3">IsPressed()</text>
+<rect x="166.8" y="391.4" width="159.5" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="174.8" y="409.5" font-size="16" font-weight="700" fill="#3730A3">ConfigureScroll()</text>
+<rect x="334.3" y="391.4" width="114.8" height="26" rx="13" fill="#EEF0FF" stroke="#C7CBF8" stroke-width="1"/>
+<text x="342.3" y="409.5" font-size="16" font-weight="700" fill="#3730A3">StopScroll()</text>
 <text x="48" y="307.4" font-size="17" font-weight="700" fill="#3730A3">HARDWARE-AGNOSTIC CORE</text>
 <text x="326.2" y="307.4" font-size="16" fill="#3730A3">SmartDisplay&lt;SpiType&gt;, inc/isf15acp4.hpp</text>
 <text x="56" y="510.4" font-size="20" font-weight="700" fill="#3730A3">Communication interface</text>

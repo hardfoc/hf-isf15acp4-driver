@@ -8,6 +8,7 @@
     "SetWindow",
     "SetFullWindow",
     "WritePixels",
+    "WriteColors",
     "DrawCanvas",
     "Present",
     "DrawPixel",
@@ -16,7 +17,8 @@
     "DrawRectangle",
     "ClearWindow",
     "IsPressed",
-    "ConfigureScroll"
+    "ConfigureScroll",
+    "StopScroll"
   ],
   "port_hooks": [
     "EnsureInitialized",
