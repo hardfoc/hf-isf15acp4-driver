@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['geometry_0',['Geometry',['../classisf15acp4_1_1_smart_display.html#a6489933118a501c011a350d845894804',1,'isf15acp4::SmartDisplay']]],
+  ['getconfig_1',['GetConfig',['../classisf15acp4_1_1_smart_display.html#ae6afb69e03523b54240cf634a1716ee3',1,'isf15acp4::SmartDisplay']]],
+  ['getdriverversion_2',['getdriverversion',['../classisf15acp4_1_1_smart_display.html#a2da287a72c43d12f0af4b14322c2ba8b',1,'isf15acp4::SmartDisplay::GetDriverVersion()'],['../namespaceisf15acp4.html#ada6fd946dcda8254a519a416614e2c3a',1,'isf15acp4::GetDriverVersion()']]],
+  ['getdriverversionmajor_3',['GetDriverVersionMajor',['../classisf15acp4_1_1_smart_display.html#a7dd0a4ea173a3ca00d7368b1fa18f6c4',1,'isf15acp4::SmartDisplay']]],
+  ['getdriverversionminor_4',['GetDriverVersionMinor',['../classisf15acp4_1_1_smart_display.html#ab0fe6b5db44f30122cf2030493c43562',1,'isf15acp4::SmartDisplay']]],
+  ['getdriverversionpatch_5',['GetDriverVersionPatch',['../classisf15acp4_1_1_smart_display.html#ac020e8296efbf4a168594f713cc3375f',1,'isf15acp4::SmartDisplay']]],
+  ['geterrorflags_6',['GetErrorFlags',['../classisf15acp4_1_1_smart_display.html#ad2bb9b5d40b488457bacb5e69904537e',1,'isf15acp4::SmartDisplay']]],
+  ['getgeometry_7',['GetGeometry',['../namespaceisf15acp4.html#ab6ef361528f6d6ee38df439bd7812705',1,'isf15acp4']]],
+  ['getglyph_8',['GetGlyph',['../namespaceisf15acp4_1_1font.html#a72820c2828687e12e68ed39d3fa207c8',1,'isf15acp4::font']]],
+  ['getgraphicsbackend_9',['GetGraphicsBackend',['../classisf15acp4_1_1_smart_display.html#a23ddf2ff8d7ed8ad872a1df052f6cf09',1,'isf15acp4::SmartDisplay']]],
+  ['getinittable_10',['GetInitTable',['../namespaceisf15acp4_1_1ssd1331.html#ab3543422cae12db7eea3c77785b28550',1,'isf15acp4::ssd1331']]],
+  ['getinittableisc01p_11',['GetInitTableIsc01p',['../namespaceisf15acp4_1_1ssd1331.html#a3fceab6faa01034ec5ff4906d28e98b8',1,'isf15acp4::ssd1331']]],
+  ['getinittableisc15anp4_12',['GetInitTableIsc15anp4',['../namespaceisf15acp4_1_1ssd1331.html#a6cdca1529846933124f4096aeeaab9ea',1,'isf15acp4::ssd1331']]],
+  ['getinittableisf15acp4_13',['GetInitTableIsf15acp4',['../namespaceisf15acp4_1_1ssd1331.html#acc7a151c28cfa9565e2cb920f923b684',1,'isf15acp4::ssd1331']]],
+  ['getlasterror_14',['GetLastError',['../classisf15acp4_1_1_smart_display.html#a292dec91b82181351e8708acfc8c7656',1,'isf15acp4::SmartDisplay']]],
+  ['getpixel_15',['getpixel',['../classisf15acp4_1_1_graphics_surface.html#a7a3da653a2e83d40ea3c27d8d9389d0e',1,'isf15acp4::GraphicsSurface::GetPixel()'],['../classisf15acp4_1_1_graphics_context.html#a5d820bfc20f851f4fa96624690eb53fe',1,'isf15acp4::GraphicsContext::GetPixel()'],['../classisf15acp4_1_1_canvas.html#a1b2db10ae16d2c236b46d81fb4a47f6d',1,'isf15acp4::Canvas::GetPixel()']]],
+  ['gpioread_16',['GpioRead',['../classisf15acp4_1_1_spi_interface.html#a8c746b969bb410573998147cf8ae4538',1,'isf15acp4::SpiInterface']]],
+  ['gpioset_17',['GpioSet',['../classisf15acp4_1_1_spi_interface.html#add9a210cea54fb432348aac4c31a4b76',1,'isf15acp4::SpiInterface']]],
+  ['gpiosetactive_18',['GpioSetActive',['../classisf15acp4_1_1_spi_interface.html#a7730ad6ae785796fc9971236fcb60e29',1,'isf15acp4::SpiInterface']]],
+  ['gpiosetinactive_19',['GpioSetInactive',['../classisf15acp4_1_1_spi_interface.html#a27b3002ea4fa4965ac9ee65f6ce2e6ba',1,'isf15acp4::SpiInterface']]],
+  ['graphicscontext_20',['GraphicsContext',['../classisf15acp4_1_1_graphics_context.html#ac5e88ac659dda4724a8ea5b200b5b306',1,'isf15acp4::GraphicsContext']]],
+  ['graphicssurface_21',['GraphicsSurface',['../classisf15acp4_1_1_graphics_surface.html#a8f47ee9ff150a8d384815edd23bc6f3a',1,'isf15acp4::GraphicsSurface']]]
+];

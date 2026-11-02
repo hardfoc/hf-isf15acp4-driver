@@ -1,0 +1,5 @@
+<map id="inc/isf15acp4_button_ui.hpp" name="inc/isf15acp4_button_ui.hpp">
+<area shape="rect" id="Node000001" title="High&#45;level button + display interaction patterns for SmartDisplay." alt="" coords="5,5,163,45"/>
+<area shape="rect" id="Node000002" href="$isf15acp4_8hpp.html" title="Hardware&#45;agnostic driver for NKK SmartDisplay OLED pushbuttons and displays." alt="" coords="16,93,152,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,59,87,93,81,93,81,59"/>
+</map>

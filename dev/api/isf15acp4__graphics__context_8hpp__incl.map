@@ -1,0 +1,28 @@
+<map id="inc/isf15acp4_graphics_context.hpp" name="inc/isf15acp4_graphics_context.hpp">
+<area shape="rect" id="Node000001" title="Runtime&#45;selectable graphics backend for SmartDisplay applications." alt="" coords="307,5,477,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="9,343,79,368"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="307,35,230,49,147,76,107,95,70,119,38,148,12,182,8,231,13,294,30,330,25,332,8,295,3,231,7,180,34,144,67,115,105,90,145,71,229,44,306,30"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="413,343,480,368"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="413,44,459,101,483,139,500,181,503,237,499,295,487,317,472,335,468,331,483,314,493,294,498,237,495,182,478,142,455,105,409,47"/>
+<area shape="rect" id="Node000004" href="$isf15acp4__canvas_8hpp.html" title="Software framebuffer and 2D drawing primitives for SmartDisplay OLEDs." alt="" coords="187,101,354,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="367,48,300,95,297,90,364,43"/>
+<area shape="rect" id="Node000008" href="$isf15acp4__graphics__surface_8hpp.html" title="Pluggable graphics surface interface for interchangeable render backends." alt="" coords="313,181,460,221"/>
+<area shape="poly" id="edge13_Node000001_Node000008" title=" " alt="" coords="394,46,390,168,385,168,389,45"/>
+<area shape="rect" id="Node000009" href="$isf15acp4__graphics__context_8ipp.html" title=" " alt="" coords="586,93,769,133"/>
+<area shape="poly" id="edge17_Node000001_Node000009" title=" " alt="" coords="455,43,602,87,601,92,454,48"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="192,129,95,151,56,166,31,183,22,200,16,218,16,258,24,297,35,329,30,331,19,298,10,259,11,217,17,198,27,180,53,161,94,145,191,123"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="355,117,388,125,420,137,450,155,474,180,484,198,489,218,487,260,476,299,462,332,457,330,471,298,482,259,484,219,479,200,470,183,447,159,418,142,386,130,354,123"/>
+<area shape="rect" id="Node000005" href="$isf15acp4__types_8hpp.html" title="Shared types, constants, and color utilities for NKK SmartDisplay OLED drivers." alt="" coords="253,269,409,295"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="276,125,287,168,304,220,320,256,315,258,299,222,282,169,271,127"/>
+<area shape="rect" id="Node000006" href="$isf15acp4__canvas_8ipp.html" title=" " alt="" coords="41,189,239,214"/>
+<area shape="poly" id="edge9_Node000004_Node000006" title=" " alt="" coords="255,128,171,183,168,179,252,124"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="285,297,93,345,92,339,284,292"/>
+<area shape="poly" id="edge8_Node000005_Node000003" title=" " alt="" coords="351,292,417,333,415,338,348,297"/>
+<area shape="rect" id="Node000007" href="$isf15acp4__font_8hpp.html" title="Compact 5x7 bitmap font for SmartDisplay text rendering." alt="" coords="81,269,228,295"/>
+<area shape="poly" id="edge10_Node000006_Node000007" title=" " alt="" coords="145,214,153,255,147,256,140,215"/>
+<area shape="poly" id="edge11_Node000007_Node000002" title=" " alt="" coords="138,297,75,337,72,333,135,292"/>
+<area shape="poly" id="edge12_Node000007_Node000003" title=" " alt="" coords="202,292,401,340,399,345,201,297"/>
+<area shape="poly" id="edge14_Node000008_Node000002" title=" " alt="" coords="314,217,165,244,103,258,71,271,61,284,54,298,48,329,42,328,49,297,57,281,68,267,102,253,164,238,313,211"/>
+<area shape="poly" id="edge15_Node000008_Node000003" title=" " alt="" coords="400,220,424,268,443,328,438,330,419,270,395,223"/>
+<area shape="poly" id="edge16_Node000008_Node000005" title=" " alt="" coords="375,223,349,260,345,256,371,220"/>
+</map>
