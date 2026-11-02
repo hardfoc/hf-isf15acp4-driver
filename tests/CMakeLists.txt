@@ -1,0 +1,22 @@
+# =============================================================================
+# hf-isf15acp4-driver: host unit tests
+# =============================================================================
+# Builds the driver headers against a recording SPI port and runs the tests
+# with CTest. No hardware and no ESP-IDF needed:
+#
+#   cmake -S . -B build-host -DHF_ISF15ACP4_BUILD_TESTS=ON
+#   cmake --build build-host
+#   ctest --test-dir build-host --output-on-failure
+# =============================================================================
+
+add_executable(hf_isf15acp4_host_tests
+  test_main.cpp
+  test_driver.cpp
+)
+
+target_link_libraries(hf_isf15acp4_host_tests PRIVATE ${HF_ISF15ACP4_TARGET_NAME})
+target_include_directories(hf_isf15acp4_host_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(hf_isf15acp4_host_tests PRIVATE cxx_std_20)
+target_compile_options(hf_isf15acp4_host_tests PRIVATE -Wall -Wextra)
+
+add_test(NAME hf_isf15acp4_host_tests COMMAND hf_isf15acp4_host_tests)
