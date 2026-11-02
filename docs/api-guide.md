@@ -75,9 +75,11 @@ These draw straight into the display RAM. A later `Present()` overwrites them wi
 --8<-- "tests/docs/api_tasks.cpp:raw"
 ```
 
-`SetWindow()` takes inclusive bounds and returns `false` with `Error::OutOfRange` outside 0..95, 0..63.
-`WritePixels()` needs an even byte count and `Initialize()` first. Send each pixel high byte first, which is the
-SSD1331's 65k-colour order. Restore the full window before the next `Present()`; `DrawCanvas()` and `Present()`
+`SetWindow()` takes inclusive bounds in display coordinates and returns `false` with `Error::OutOfRange` outside
+the visible area (0..95, 0..63 on the ISF15ACP4); on the smaller variants the driver adds the RAM column offset.
+`WriteColors()` needs `Initialize()` first and sends each `Color565` pixel high byte first, the SSD1331's
+65k-colour order. `WritePixels()` sends raw bytes unchanged, two per pixel already in that format, and needs an even
+byte count. Restore the full window before the next `Present()`; `DrawCanvas()` and `Present()`
 set it themselves.
 
 ## Brightness and power
@@ -104,10 +106,12 @@ Lower brightness also slows the OLED's ageing. `SetMasterCurrent()` rejects valu
 --8<-- "tests/docs/api_tasks.cpp:scroll"
 ```
 
-`ConfigureScroll(h_offset, start_row, rows, v_offset, interval, activate)` sends the SSD1331 scroll setup (`27h`)
-and then starts (`2Fh`) or stops (`2Eh`) scrolling. The interval code is 0 to 3: a step every 6, 10, 100 or 200
-frames. The SSD1331 datasheet says not to change the scroll parameters while scrolling runs, and to rewrite the
-display RAM after stopping it: call `Present()` (or redraw) after `ConfigureScroll(..., false)`.
+`ConfigureScroll(h_offset, start_row, rows, v_offset, interval, activate)` stops any running scroll (`2Eh`), sends
+the SSD1331 scroll setup (`27h`) and, with `activate`, starts it (`2Fh`): the datasheet forbids changing the
+parameters while scrolling runs. The interval code is 0 to 3: a step every 6, 10, 100 or 200 frames.
+
+Stopping leaves the display RAM shifted, and the datasheet says to rewrite it: `StopScroll(gfx)` sends `2Eh` and
+then `Present(gfx)`. `StopScroll()` without a context only sends `2Eh`; redraw yourself afterwards.
 
 ## Read the switch
 

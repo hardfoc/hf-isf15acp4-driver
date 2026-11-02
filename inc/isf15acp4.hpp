@@ -47,7 +47,7 @@ public:
      *
      * Sequence:
      * 1. Ensure SPI/GPIO ready
-     * 2. Hold RES low >= 3 us, then release
+     * 2. Assert Reset (RES# low) >= 3 us, release it (high), wait for reset completion
      * 3. Optionally enable VCC rail via VccEnable pin
      * 4. Transmit variant-specific initialization table
      * 5. Configure default memory window
@@ -80,7 +80,8 @@ public:
 
     /**
      * @brief Configure the active GRAM download window.
-     * @param rect Inclusive pixel rectangle in display coordinates.
+     * @param rect Inclusive pixel rectangle in display coordinates (0..width-1, 0..height-1). The driver adds the
+     *             variant's RAM column/row offset (DisplayGeometry::column_start / row_start).
      */
     bool SetWindow(const Rect& rect) noexcept;
 
@@ -88,11 +89,27 @@ public:
     bool SetFullWindow() noexcept;
 
     /**
-     * @brief Stream RGB565 pixels to the controller GRAM.
+     * @brief Stream raw pixel bytes to the controller GRAM, unchanged.
+     *
+     * The bytes must already be in the panel's 65k-colour format: two bytes per pixel, high byte first, blue in
+     * bits 15..11 and red in bits 4..0 (see ssd1331::ToPanelPixel()). For Color565 buffers use WriteColors().
+     *
      * @param data Pixel buffer (two bytes per pixel).
      * @param byte_len Number of bytes (must be even).
      */
     bool WritePixels(const uint8_t* data, std::size_t byte_len) noexcept;
+
+    /**
+     * @brief Stream Color565 pixels to the controller GRAM in the SSD1331 65k-colour byte order.
+     *
+     * Each pixel is converted to the panel's colour order (ssd1331::ToPanelPixel(): blue in the high bits) and goes
+     * out high byte first (SSD1331 rev 1.2 section 7.5.2, Table 9), whatever the CPU's byte order, in one data
+     * transaction. Use this instead of WritePixels() for Color565 buffers.
+     *
+     * @param colors Pixel buffer.
+     * @param count Number of pixels (not bytes).
+     */
+    bool WriteColors(const Color565* colors, std::size_t count) noexcept;
 
     /** @brief Upload an entire canvas framebuffer. */
     bool DrawCanvas(const Canvas& canvas) noexcept;
@@ -100,10 +117,22 @@ public:
     /** @brief Present any graphics backend to the panel. */
     bool Present(const GraphicsContext& gfx) noexcept;
 
-    /** @brief Create a graphics context matching this display configuration. */
+    /**
+     * @brief Create a graphics context matching this display configuration.
+     *
+     * With GraphicsBackend::HardwareDirect the returned context is already bound to this display
+     * (ConfigurePresenter()), so its shapes go to the panel at once. The display must outlive the context.
+     */
+    [[nodiscard]] GraphicsContext CreateGraphicsContext() noexcept;
+
+    /**
+     * @brief Create an unbound graphics context matching this display configuration.
+     *
+     * A const display cannot bind itself: for HardwareDirect, call ConfigurePresenter() on the result.
+     */
     [[nodiscard]] GraphicsContext CreateGraphicsContext() const noexcept;
 
-    /** @brief Register presenter hooks for HardwareDirect backend. */
+    /** @brief Register presenter hooks for HardwareDirect backend (bind this display to @p gfx). */
     void ConfigurePresenter(GraphicsContext& gfx) noexcept;
 
     /** @brief Active graphics backend selected at construction. */
@@ -118,13 +147,13 @@ public:
     /** @brief Fill the panel with a solid color. */
     bool FillScreen(Color565 color) noexcept;
 
-    /** @brief Draw a hardware-accelerated line (command 21H). */
+    /** @brief Draw a hardware-accelerated line (command 21H), in display coordinates. */
     bool DrawLine(const Point& start, const Point& end, Color565 color) noexcept;
 
-    /** @brief Draw a hardware rectangle outline (command 22H). */
+    /** @brief Draw a hardware rectangle outline (command 22H), in display coordinates. */
     bool DrawRectangle(const Rect& rect, Color565 color, bool filled = false) noexcept;
 
-    /** @brief Clear a rectangular window via controller command 25H. */
+    /** @brief Clear a rectangular window via controller command 25H, in display coordinates. */
     bool ClearWindow(const Rect& rect) noexcept;
 
     /**
@@ -133,9 +162,26 @@ public:
      */
     [[nodiscard]] bool IsPressed() const noexcept;
 
-    /** @brief Enable/disable hardware scrolling (commands 27H/2FH/2EH). */
+    /**
+     * @brief Set up hardware scrolling and optionally start it.
+     *
+     * Always stops scrolling first (2EH), then sends the setup (27H) and, when @p activate is true, starts it
+     * (2FH): the SSD1331 must not get new scroll parameters while scrolling runs (rev 1.2 Table 10, 27H note 2).
+     * With @p activate false the scroll stays stopped; rewrite the display RAM afterwards (see StopScroll()).
+     */
     bool ConfigureScroll(uint8_t h_offset, uint8_t start_row, uint8_t scroll_rows,
                          uint8_t v_offset, uint8_t interval_code, bool activate) noexcept;
+
+    /**
+     * @brief Stop hardware scrolling (2EH).
+     *
+     * The display RAM stays shifted: the SSD1331 needs it rewritten after 2EH (rev 1.2 Table 10). Prefer
+     * StopScroll(const GraphicsContext&), or redraw yourself.
+     */
+    bool StopScroll() noexcept;
+
+    /** @brief Stop hardware scrolling (2EH), then rewrite the display RAM with Present(@p gfx). */
+    bool StopScroll(const GraphicsContext& gfx) noexcept;
 
     [[nodiscard]] uint16_t GetErrorFlags() const noexcept { return error_flags_; }
     [[nodiscard]] bool HasError(Error e) const noexcept {
@@ -169,6 +215,7 @@ private:
     void pulseReset() noexcept;
     bool runInitTable() noexcept;
     static void colorToSsd1331(Color565 color, uint8_t out[3]) noexcept;
+    [[nodiscard]] Rect toRam(const Rect& rect) const noexcept;
 };
 
 inline const char* GetDriverVersion() noexcept { return HF_ISF15ACP4_VERSION_STRING; }

@@ -10,7 +10,7 @@ most questions in minutes.
 
 | Check | Fix |
 | --- | --- |
-| RES is low after `Initialize()` | Map `Reset` `Active` to high ([Porting](porting.md#control-pins)); the ESP32 example port needs this |
+| RES is low after `Initialize()` | Map `Reset` `Active` to low, `Inactive` to high ([Porting](porting.md#control-pins)) |
 | VCC (pin 9) is not 14 V to 16 V | `VccEnable` mapping, your supply's enable level, `Initialize(true)` |
 | D/C is high during the init table | `BeginCommand()` must set D/C low |
 | SS rises between an opcode and its parameters | One SS-low transaction per Begin / End pair |
@@ -26,26 +26,32 @@ most questions in minutes.
 | `NotInitialized` | Your `EnsureInitialized()` returned `false`: the SPI bus or GPIO set-up failed |
 | `SpiWrite` | `BeginCommand()` or `WriteBytes()` returned `false` |
 | `InvalidParam` | The driver was constructed with a null port pointer |
-| `OutOfRange` | See the next section |
+| `OutOfRange` | A window outside the visible area: see the next section |
 
 ## `Initialize()` fails with `OutOfRange`
 
-You selected `ProductVariant::Isc15anp4` or `Isc01p`. Their visible area starts at a column offset, and in this
-release `SetWindow()` rejects the full window as wider than the panel. Only `Isf15acp4` initialises
+`SetWindow()` takes display coordinates and rejects a rectangle that goes past the variant's visible area
+(96 x 64, 64 x 48 or 52 x 36). Do not add the ISC15ANP4 or ISC01P column offset yourself: the driver does
 ([Hardware](hardware.md#product-variants)).
 
 ## Colours wrong after `Present()`
 
-Shapes and text are in the right place but the colours are not, while `DrawPixel()`, `DrawLine()` and
-`FillScreen(colors::White)` look right: the frame went out low byte first. The SSD1331 takes each pixel high byte
-first, and `Present()` sends the canvas in memory order, which is low byte first on ESP32, Arm Cortex-M and x86.
-Swap the bytes around the upload ([Graphics](graphics.md#colours)).
+Shapes and text are in the right place but the colours are not. The driver sends each pixel high byte first on
+any CPU, so check your own code:
 
-## Red and blue swapped in hardware shapes
+- Remove any byte swap added around `Present()` for earlier releases: it now swaps the frame back.
+- `WritePixels()` sends your bytes unchanged. For `Color565` buffers use `WriteColors()`
+  ([API guide](api-guide.md#write-pixels-yourself)).
 
-`DrawLine()` and `DrawRectangle()` send the colour as three components (C, B, A). Compare one against
-`DrawPixel()` in the same colour: if red and blue differ between them, draw that shape in the canvas instead
-(`GraphicsContext::DrawHLine()`, `FillRect()`) until the driver is fixed.
+## Red and blue swapped
+
+The panel stores pixels as blue, green, red, and the driver converts every `Color565` it sends. If red shows as
+blue in one kind of drawing only, check:
+
+- Raw `WritePixels()` bytes: they go out unchanged, so convert each colour with `ssd1331::ToPanelPixel()` or use
+  `WriteColors()`.
+- A remap value (`A0h`) changed from the NKK initialisation table: bit 2 selects the colour order. Keep the
+  table's value.
 
 ## Image stretched or offset
 
@@ -68,7 +74,7 @@ Swap the bytes around the upload ([Graphics](graphics.md#colours)).
 | Symptom | Cause and fix |
 | --- | --- |
 | Uneven brightness after months | Busy pixels age faster: move static screens, lower the master current, turn off when idle |
-| Old content after scrolling stops | The SSD1331 needs its RAM rewritten: `Present()` after `ConfigureScroll(..., false)` |
+| Old content after scrolling stops | The SSD1331 needs its RAM rewritten: stop with `StopScroll(gfx)`, or `Present()` after `StopScroll()` |
 | Hardware shapes disappear | `Present()` overwrote them: draw everything in the canvas |
 
 ## ESP32 example does not build

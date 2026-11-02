@@ -41,8 +41,9 @@ Every context holds a full 96 x 64 frame (12,288 bytes), so create one and keep 
 
 What to know before choosing it:
 
-- **Bind the context you draw on.** `ConfigurePresenter(gfx)` connects that one context to the display. The
-  binding `Initialize()` makes is on a temporary context and does not carry over.
+- **The context comes bound.** `display.CreateGraphicsContext()` connects the context it returns to the display.
+  A context you construct yourself, or get from a `const` display, needs `display.ConfigurePresenter(gfx)`.
+  Keep the display alive as long as the context.
 - **Text and images stay in RAM.** `DrawChar()`, `DrawString()` and `BlitRgb565()` draw into the context's frame,
   which `Present()` never sends in this mode.
 - **It saves no RAM.** The context still holds a 12,288-byte frame, and `Clear()` becomes `FillScreen()`, which
@@ -63,13 +64,14 @@ Colours are `Color565`: 16-bit RGB565, red in bits 15 to 11, green 10 to 5, blue
 
 The presets are `Black`, `White`, `Red`, `Green`, `Blue`, `Yellow`, `Cyan`, `Magenta`, `Orange` and `Gray`.
 
-The SSD1331 takes each pixel as two bytes, high byte first. `DrawPixel()` and the hardware commands send that
-order; `Present()` sends the frame as it is in memory, which is the other way round on little-endian MCUs. If
-colours come out wrong after `Present()`, swap the bytes around the upload:
+The SSD1331 takes each pixel as two bytes, high byte first (65k-colour format, SSD1331 datasheet Table 9).
+`Present()`, `DrawCanvas()`, `FillScreen()`, `DrawPixel()` and `WriteColors()` send that order on any CPU, so the
+canvas stays in native byte order and needs no swapping.
 
-```cpp
---8<-- "tests/docs/graphics.cpp:byte-order"
-```
+The panel stores each pixel as blue, green, red (blue in bits 15 to 11, red in 4 to 0; NKK application notes,
+section 9). The same calls convert every `Color565` to that order with `ssd1331::ToPanelPixel()`, and the
+hardware line and rectangle commands send red as colour A and blue as colour C, so a colour looks the same however
+it is drawn. Only `WritePixels()` sends bytes unchanged: give it panel-order words.
 
 ## Text
 

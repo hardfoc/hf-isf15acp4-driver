@@ -62,8 +62,15 @@ struct InitStep {
     uint8_t data_len;
 };
 
-/** @brief Minimum reset pulse width per NKK timing specifications. */
+/** @brief Minimum RES# low pulse width (SSD1331 rev 1.2 Table 18; NKK power ON sequence). */
 inline constexpr uint32_t kResetPulseMinUs = 3;
+
+/**
+ * @brief Wait after releasing RES# before the first command.
+ *
+ * The SSD1331 reset completion time is 2 us maximum (rev 1.2 Table 18); the driver waits longer for margin.
+ */
+inline constexpr uint32_t kResetRecoveryUs = 10;
 
 /** @brief Maximum SPI clock per datasheet (6.6 MHz). */
 inline constexpr uint32_t kMaxSpiClockHz = 6'600'000;
@@ -128,6 +135,21 @@ inline const InitStep* GetInitTableIsc01p(std::size_t& count) noexcept {
     };
     count = sizeof(kTable) / sizeof(kTable[0]);
     return kTable;
+}
+
+/**
+ * @brief Convert an RGB565 colour to the 16-bit pixel word the NKK panels expect in display RAM.
+ *
+ * The NKK init tables set A0h bit 2 = 0 (normal colour order SA, SB, SC), and the panels wire colour C to blue
+ * and colour A to red. The 65k-colour pixel word is therefore C4..C0 B5..B0 A4..A0 = blue, green, red
+ * (NKK Application Notes rev H section 9; SSD1331 rev 1.2 Table 9 and command A0h). This swaps the red and blue
+ * fields of a Color565; green stays in place. The hardware drawing commands (21h, 22h) take C, B, A separately.
+ *
+ * @param color RGB565 colour (red in bits 15..11).
+ * @return Panel pixel word (blue in bits 15..11, red in bits 4..0), sent high byte first.
+ */
+inline constexpr uint16_t ToPanelPixel(Color565 color) noexcept {
+    return static_cast<uint16_t>(((color & 0x001Fu) << 11) | (color & 0x07E0u) | ((color >> 11) & 0x001Fu));
 }
 
 /**

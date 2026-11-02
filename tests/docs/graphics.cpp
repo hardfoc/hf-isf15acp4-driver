@@ -19,8 +19,7 @@ bool hardware_direct(MySpi& spi) {
   if (!display.Initialize()) {
     return false;
   }
-  auto gfx = display.CreateGraphicsContext();
-  display.ConfigurePresenter(gfx);                        // bind THIS context to the display
+  auto gfx = display.CreateGraphicsContext();             // already bound to this display
 
   gfx.FillRect({8, 8, 87, 55}, colors::Blue);             // sent at once as 26h / 22h
   gfx.DrawHLine(8, 87, 31, colors::White);                // sent at once as 21h
@@ -81,20 +80,3 @@ void dashboard(Display& display, isf15acp4::GraphicsContext& gfx, float load) {
   display.Present(gfx);
   // --8<-- [end:gauge]
 }
-
-// --8<-- [start:byte-order]
-// Present() sends the canvas in memory order. On a little-endian MCU that is low byte first, while the SSD1331
-// takes the high byte first: swap around the upload.
-bool present_high_byte_first(Display& display, isf15acp4::GraphicsContext& gfx) {
-  auto swap_all = [&gfx] {
-    isf15acp4::Color565* px = gfx.Data();
-    for (std::size_t i = 0; i < gfx.ByteSize() / 2; ++i) {
-      px[i] = static_cast<isf15acp4::Color565>((px[i] >> 8) | (px[i] << 8));
-    }
-  };
-  swap_all();
-  const bool ok = display.Present(gfx);
-  swap_all();                                             // the canvas is back to normal for drawing
-  return ok;
-}
-// --8<-- [end:byte-order]

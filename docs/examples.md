@@ -8,11 +8,6 @@ at 6 MHz; the port is [`esp32_isf15acp4_spi_adapter.hpp`](../examples/esp32/main
 and the set-up helpers are in [`esp32_isf15acp4_setup.hpp`](../examples/esp32/main/esp32_isf15acp4_setup.hpp).
 CI builds every app below on each pull request.
 
-!!! warning "Reset mapping in the example port"
-    The example adapter maps `CtrlPin::Reset` `Active` to low, which leaves the display in reset after
-    `Initialize()` in this release. Swap the two levels in its `GpioSet()` before running the apps on hardware
-    ([Porting](porting.md#control-pins)).
-
 ## The apps
 
 <!-- generated: examples -->

@@ -39,8 +39,23 @@ Both options default to `OFF`:
 | `HF_ISF15ACP4_ENABLE_WARNINGS` | `-Wall -Wextra -Wpedantic` on the driver |
 | `HF_ISF15ACP4_BUILD_TESTS` | The host tests in `tests/` ([Testing and CI](testing.md)) |
 
-The root `CMakeLists.txt` also has `install()` rules and a `hf_isf15acp4Config.cmake` package. The installed
-headers do not include `src/*.ipp`, which they need, so use `add_subdirectory()` until that is fixed.
+### Installed package
+
+The root `CMakeLists.txt` installs the static library, the headers with the `.ipp` files they include and the
+generated version header, and a `hf_isf15acp4Config.cmake` package:
+
+```bash
+cmake -S . -B build && cmake --build build && cmake --install build --prefix /opt/hardfoc
+```
+
+```cmake
+find_package(hf_isf15acp4 1 REQUIRED CONFIG)    # CMAKE_PREFIX_PATH=/opt/hardfoc
+target_link_libraries(my_app PRIVATE hf::isf15acp4)
+```
+
+The headers go to `include/hf_isf15acp4/inc/` and the `.ipp` files to `include/hf_isf15acp4/src/`, the same layout
+as the source tree; the target adds `include/hf_isf15acp4/inc` to your include path. The host test
+`hf_isf15acp4_install_package` installs into the build tree and builds a consumer against it.
 
 ## ESP-IDF
 

@@ -27,8 +27,7 @@ bool presenterFillScreen(void* ctx, Color565 color) noexcept {
 
 template <typename SpiType>
 bool presenterFlushCanvas(void* ctx, const Color565* data, std::size_t bytes) noexcept {
-    return static_cast<SmartDisplay<SpiType>*>(ctx)->WritePixels(
-        reinterpret_cast<const uint8_t*>(data), bytes);
+    return static_cast<SmartDisplay<SpiType>*>(ctx)->WriteColors(data, bytes / sizeof(Color565));
 }
 
 }  // namespace detail
@@ -36,7 +35,7 @@ bool presenterFlushCanvas(void* ctx, const Color565* data, std::size_t bytes) no
 template <typename SpiType>
 SmartDisplay<SpiType>::SmartDisplay(SpiType* bus, const SmartDisplayConfig& config) noexcept
     : bus_(bus), config_(config), variant_(config.variant), geometry_(GetGeometry(config.variant)) {
-    window_ = {geometry_.column_start, geometry_.row_start, geometry_.column_end, geometry_.row_end};
+    window_ = {0, 0, static_cast<uint8_t>(geometry_.width - 1), static_cast<uint8_t>(geometry_.height - 1)};
 }
 
 template <typename SpiType>
@@ -51,10 +50,12 @@ void SmartDisplay<SpiType>::setError(Error e) noexcept {
 
 template <typename SpiType>
 void SmartDisplay<SpiType>::pulseReset() noexcept {
-    bus_->GpioSetInactive(CtrlPin::Reset);
-    bus_->DelayUs(ssd1331::kResetPulseMinUs);
+    // SSD1331 rev 1.2, section 7.9 and Table 18: hold RES# low (Reset asserted = Active) for at least 3 us, release
+    // it high (Inactive), then allow the reset completion time (2 us max) before the first command.
     bus_->GpioSetActive(CtrlPin::Reset);
-    bus_->DelayUs(10);
+    bus_->DelayUs(ssd1331::kResetPulseMinUs);
+    bus_->GpioSetInactive(CtrlPin::Reset);
+    bus_->DelayUs(ssd1331::kResetRecoveryUs);
 }
 
 template <typename SpiType>
@@ -136,11 +137,6 @@ bool SmartDisplay<SpiType>::Initialize(bool enable_vcc) noexcept {
         return false;
     }
 
-    if (config_.graphics == GraphicsBackend::HardwareDirect) {
-        GraphicsContext gfx = CreateGraphicsContext();
-        ConfigurePresenter(gfx);
-    }
-
     initialized_ = true;
     return true;
 }
@@ -183,8 +179,11 @@ bool SmartDisplay<SpiType>::SetWindow(const Rect& rect) noexcept {
         return false;
     }
 
-    const uint8_t col_data[2] = {rect.x0, rect.x1};
-    const uint8_t row_data[2] = {rect.y0, rect.y1};
+    // Display coordinates to controller RAM addresses: the ISC15ANP4 and ISC01P show a window of the 96 x 64 RAM
+    // starting at column 10h / 16h (NKK Application Notes rev H, Tables 4 and 5).
+    const Rect ram = toRam(rect);
+    const uint8_t col_data[2] = {ram.x0, ram.x1};
+    const uint8_t row_data[2] = {ram.y0, ram.y1};
 
     if (!sendCommand(static_cast<uint8_t>(ssd1331::Command::SetColumnAddress), col_data, 2)) {
         return false;
@@ -199,8 +198,13 @@ bool SmartDisplay<SpiType>::SetWindow(const Rect& rect) noexcept {
 
 template <typename SpiType>
 bool SmartDisplay<SpiType>::SetFullWindow() noexcept {
-    return SetWindow({geometry_.column_start, geometry_.row_start, geometry_.column_end,
-                      geometry_.row_end});
+    return SetWindow({0, 0, static_cast<uint8_t>(geometry_.width - 1), static_cast<uint8_t>(geometry_.height - 1)});
+}
+
+template <typename SpiType>
+Rect SmartDisplay<SpiType>::toRam(const Rect& rect) const noexcept {
+    return {static_cast<uint8_t>(rect.x0 + geometry_.column_start), static_cast<uint8_t>(rect.y0 + geometry_.row_start),
+            static_cast<uint8_t>(rect.x1 + geometry_.column_start), static_cast<uint8_t>(rect.y1 + geometry_.row_start)};
 }
 
 template <typename SpiType>
@@ -230,6 +234,48 @@ bool SmartDisplay<SpiType>::WritePixels(const uint8_t* data, std::size_t byte_le
 }
 
 template <typename SpiType>
+bool SmartDisplay<SpiType>::WriteColors(const Color565* colors, std::size_t count) noexcept {
+    if (!initialized_) {
+        setError(Error::NotInitialized);
+        return false;
+    }
+    if (colors == nullptr || count == 0) {
+        setError(Error::InvalidParam);
+        return false;
+    }
+
+    if (!bus_->BeginData()) {
+        setError(Error::SpiWrite);
+        return false;
+    }
+
+    // SSD1331 rev 1.2 section 7.5.2, Table 9 (65k colour, 8-bit interface): first byte C4..C0 B5..B3, second byte
+    // B2..B0 A4..A0, i.e. the 16-bit pixel high byte first, with C = blue and A = red on the NKK panels
+    // (ToPanelPixel). Serialise explicitly so the CPU's byte order does not matter, in chunks inside one data
+    // transaction.
+    constexpr std::size_t kChunkPixels = 64;
+    uint8_t chunk[kChunkPixels * 2];
+    std::size_t done = 0;
+    while (done < count) {
+        const std::size_t n = (count - done) < kChunkPixels ? (count - done) : kChunkPixels;
+        for (std::size_t i = 0; i < n; ++i) {
+            const uint16_t c = ssd1331::ToPanelPixel(colors[done + i]);
+            chunk[2 * i] = static_cast<uint8_t>(c >> 8);
+            chunk[2 * i + 1] = static_cast<uint8_t>(c & 0xFF);
+        }
+        if (!bus_->WriteBytes(chunk, n * 2)) {
+            bus_->EndTransaction();
+            setError(Error::SpiWrite);
+            return false;
+        }
+        done += n;
+    }
+
+    bus_->EndTransaction();
+    return true;
+}
+
+template <typename SpiType>
 bool SmartDisplay<SpiType>::DrawCanvas(const Canvas& canvas) noexcept {
     if (canvas.Width() != geometry_.width || canvas.Height() != geometry_.height) {
         setError(Error::InvalidParam);
@@ -238,12 +284,21 @@ bool SmartDisplay<SpiType>::DrawCanvas(const Canvas& canvas) noexcept {
     if (!SetFullWindow()) {
         return false;
     }
-    return WritePixels(reinterpret_cast<const uint8_t*>(canvas.Data()), canvas.ByteSize());
+    return WriteColors(canvas.Data(), canvas.ByteSize() / sizeof(Color565));
 }
 
 template <typename SpiType>
 GraphicsContext SmartDisplay<SpiType>::CreateGraphicsContext() const noexcept {
     return GraphicsContext(variant_, config_.graphics);
+}
+
+template <typename SpiType>
+GraphicsContext SmartDisplay<SpiType>::CreateGraphicsContext() noexcept {
+    GraphicsContext gfx(variant_, config_.graphics);
+    if (config_.graphics == GraphicsBackend::HardwareDirect) {
+        ConfigurePresenter(gfx);
+    }
+    return gfx;
 }
 
 template <typename SpiType>
@@ -271,8 +326,7 @@ bool SmartDisplay<SpiType>::DrawPixel(uint8_t x, uint8_t y, Color565 color) noex
     if (!SetWindow({x, y, x, y})) {
         return false;
     }
-    const uint8_t bytes[2] = {static_cast<uint8_t>(color >> 8), static_cast<uint8_t>(color & 0xFF)};
-    return WritePixels(bytes, sizeof(bytes));
+    return WriteColors(&color, 1);
 }
 
 template <typename SpiType>
@@ -284,6 +338,7 @@ bool SmartDisplay<SpiType>::FillScreen(Color565 color) noexcept {
 
 template <typename SpiType>
 void SmartDisplay<SpiType>::colorToSsd1331(Color565 color, uint8_t out[3]) noexcept {
+    // NKK panels: colour A = red, B = green, C = blue (NKK Application Notes rev H section 9; init A0h bit 2 = 0).
     out[0] = static_cast<uint8_t>((color >> 11) & 0x1F);  // A: red 5-bit
     out[1] = static_cast<uint8_t>((color >> 5) & 0x3F);   // B: green 6-bit
     out[2] = static_cast<uint8_t>(color & 0x1F);          // C: blue 5-bit
@@ -293,7 +348,8 @@ template <typename SpiType>
 bool SmartDisplay<SpiType>::DrawLine(const Point& start, const Point& end, Color565 color) noexcept {
     uint8_t rgb[3];
     colorToSsd1331(color, rgb);
-    const uint8_t data[7] = {start.x, start.y, end.x, end.y,
+    const Rect ram = toRam({start.x, start.y, end.x, end.y});
+    const uint8_t data[7] = {ram.x0, ram.y0, ram.x1, ram.y1,
                              static_cast<uint8_t>(rgb[2] << 1), rgb[1],
                              static_cast<uint8_t>(rgb[0] << 1)};
     return sendCommand(static_cast<uint8_t>(ssd1331::Command::DrawLine), data, sizeof(data));
@@ -310,7 +366,8 @@ bool SmartDisplay<SpiType>::DrawRectangle(const Rect& rect, Color565 color, bool
 
     uint8_t rgb[3];
     colorToSsd1331(color, rgb);
-    const uint8_t data[10] = {rect.x0, rect.y0, rect.x1, rect.y1,
+    const Rect ram = toRam(rect);
+    const uint8_t data[10] = {ram.x0, ram.y0, ram.x1, ram.y1,
                               static_cast<uint8_t>(rgb[2] << 1), rgb[1],
                               static_cast<uint8_t>(rgb[0] << 1),
                               static_cast<uint8_t>(rgb[2] << 1), rgb[1],
@@ -327,7 +384,8 @@ bool SmartDisplay<SpiType>::DrawRectangle(const Rect& rect, Color565 color, bool
 
 template <typename SpiType>
 bool SmartDisplay<SpiType>::ClearWindow(const Rect& rect) noexcept {
-    const uint8_t data[4] = {rect.x0, rect.y0, rect.x1, rect.y1};
+    const Rect ram = toRam(rect);
+    const uint8_t data[4] = {ram.x0, ram.y0, ram.x1, ram.y1};
     return sendCommand(static_cast<uint8_t>(ssd1331::Command::ClearWindow), data, sizeof(data));
 }
 
@@ -340,13 +398,34 @@ template <typename SpiType>
 bool SmartDisplay<SpiType>::ConfigureScroll(uint8_t h_offset, uint8_t start_row, uint8_t scroll_rows,
                                             uint8_t v_offset, uint8_t interval_code,
                                             bool activate) noexcept {
+    // SSD1331 rev 1.2 Table 10, 27h note 2: the parameters must not change while scrolling is active, so stop
+    // first (NKK Application Notes rev H section 12: send 27h only with scrolling deactivated).
+    if (!StopScroll()) {
+        return false;
+    }
     const uint8_t data[5] = {h_offset, start_row, scroll_rows, v_offset,
                               static_cast<uint8_t>(interval_code & 0x03)};
     if (!sendCommand(static_cast<uint8_t>(ssd1331::Command::ScrollSetup), data, sizeof(data))) {
         return false;
     }
-    return sendCommandOnly(activate ? static_cast<uint8_t>(ssd1331::Command::ActivateScroll)
-                                    : static_cast<uint8_t>(ssd1331::Command::DeactivateScroll));
+    if (!activate) {
+        return true;
+    }
+    return sendCommandOnly(static_cast<uint8_t>(ssd1331::Command::ActivateScroll));
+}
+
+template <typename SpiType>
+bool SmartDisplay<SpiType>::StopScroll() noexcept {
+    return sendCommandOnly(static_cast<uint8_t>(ssd1331::Command::DeactivateScroll));
+}
+
+template <typename SpiType>
+bool SmartDisplay<SpiType>::StopScroll(const GraphicsContext& gfx) noexcept {
+    // SSD1331 rev 1.2 Table 10, 2Eh note: after deactivating, the RAM data needs to be rewritten.
+    if (!StopScroll()) {
+        return false;
+    }
+    return Present(gfx);
 }
 
 }  // namespace isf15acp4

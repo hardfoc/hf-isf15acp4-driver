@@ -42,6 +42,45 @@ TEST_CASE("Initialize sends the ISF15ACP4 table, then the full 96x64 window") {
   CHECK_EQ(spi.open_transactions, 0);
 }
 
+TEST_CASE("ISC15ANP4 and ISC01P initialise with their RAM windows, and drawing is offset into them") {
+  // NKK Application Notes rev H, Tables 4 and 5: ISC15ANP4 window 15h 10h 4Fh / 75h 00h 2Fh (64 x 48),
+  // ISC01P window 15h 16h 49h / 75h 00h 23h (52 x 36). Display (0, 0) is RAM column 10h / 16h.
+  struct Case {
+    isf15acp4::ProductVariant variant;
+    uint8_t col0, col1, row1;
+  };
+  for (const Case& c : {Case{isf15acp4::ProductVariant::Isc15anp4, 0x10, 0x4F, 0x2F},
+                        Case{isf15acp4::ProductVariant::Isc01p, 0x16, 0x49, 0x23}}) {
+    isf15acp4_test::MockSpi spi;
+    Display display(&spi, c.variant);
+    REQUIRE(display.Initialize());
+    CHECK(!display.HasError(isf15acp4::Error::OutOfRange));
+    auto cmds = spi.commands();
+    REQUIRE(cmds.size() >= 2);
+    CHECK(cmds[cmds.size() - 2] == bytes({0x15, c.col0, c.col1}));
+    CHECK(cmds[cmds.size() - 1] == bytes({0x75, 0x00, c.row1}));
+
+    spi.clear();
+    REQUIRE(display.DrawPixel(1, 2, isf15acp4::colors::White));
+    CHECK(spi.transactions[0].bytes == bytes({0x15, uint8_t(c.col0 + 1), uint8_t(c.col0 + 1)}));
+    CHECK(spi.transactions[1].bytes == bytes({0x75, 2, 2}));
+
+    const auto& g = display.Geometry();
+    CHECK(!display.SetWindow({0, 0, g.width, 0}));  // one column past the visible area
+    spi.clear();
+    REQUIRE(display.DrawLine({0, 0}, {3, 4}, isf15acp4::colors::Black));
+    REQUIRE(display.ClearWindow({0, 0, 3, 4}));
+    cmds = spi.commands();
+    CHECK(cmds[0] == bytes({0x21, c.col0, 0, uint8_t(c.col0 + 3), 4, 0, 0, 0}));
+    CHECK(cmds[1] == bytes({0x25, c.col0, 0, uint8_t(c.col0 + 3), 4}));
+
+    auto gfx = display.CreateGraphicsContext();
+    spi.clear();
+    REQUIRE(display.Present(gfx));
+    CHECK_EQ(spi.transactions.back().bytes.size(), g.framebuffer_bytes);
+  }
+}
+
 TEST_CASE("Every command and its parameters go in one CS-low transaction") {
   isf15acp4_test::MockSpi spi;
   Display display(&spi);
@@ -52,28 +91,45 @@ TEST_CASE("Every command and its parameters go in one CS-low transaction") {
   }
 }
 
-TEST_CASE("Reset pulse is at least 3 us, VCC is enabled after it") {
+TEST_CASE("Reset asserts RES# for at least 3 us, releases it, and waits before the first command") {
+  // SSD1331 rev 1.2 section 7.9 and Table 18: RES# low >= 3 us, then high; reset completes within 2 us.
   isf15acp4_test::MockSpi spi;
   Display display(&spi);
   REQUIRE(display.Initialize(true));
 
-  const isf15acp4_test::PinEvent* first_reset = nullptr;
-  const isf15acp4_test::PinEvent* second_reset = nullptr;
+  std::vector<isf15acp4_test::PinEvent> reset;
   const isf15acp4_test::PinEvent* vcc_on = nullptr;
   for (const auto& e : spi.pins) {
     if (e.pin == CtrlPin::Reset) {
-      (first_reset == nullptr ? first_reset : second_reset) = &e;
+      reset.push_back(e);
     }
     if (e.pin == CtrlPin::VccEnable && e.signal == GpioSignal::Active) {
       vcc_on = &e;
     }
   }
-  REQUIRE(first_reset != nullptr && second_reset != nullptr && vcc_on != nullptr);
-  // The driver drives Reset INACTIVE, waits, then ACTIVE and leaves it there (see the Porting page).
-  CHECK(first_reset->signal == GpioSignal::Inactive);
-  CHECK(second_reset->signal == GpioSignal::Active);
-  CHECK(second_reset->time_us - first_reset->time_us >= isf15acp4::ssd1331::kResetPulseMinUs);
-  CHECK(vcc_on->time_us >= second_reset->time_us);
+  REQUIRE(reset.size() == 2);
+  REQUIRE(vcc_on != nullptr);
+  CHECK(reset[0].signal == GpioSignal::Active);    // RES# low: chip held in reset
+  CHECK(reset[1].signal == GpioSignal::Inactive);  // RES# high: chip released and left running
+  CHECK(reset[1].time_us - reset[0].time_us >= isf15acp4::ssd1331::kResetPulseMinUs);
+  CHECK(vcc_on->time_us >= reset[0].time_us + 3);  // t2: VCC at least 3 us after RES# went low
+  CHECK(vcc_on->time_us >= reset[1].time_us + 2);  // after the reset completion time
+}
+
+TEST_CASE("Reset() leaves RES# released") {
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  REQUIRE(display.Initialize());
+  spi.clear();
+  REQUIRE(display.Reset());
+  const isf15acp4_test::PinEvent* last = nullptr;
+  for (const auto& e : spi.pins) {
+    if (e.pin == CtrlPin::Reset) {
+      last = &e;
+    }
+  }
+  REQUIRE(last != nullptr);
+  CHECK(last->signal == GpioSignal::Inactive);
 }
 
 TEST_CASE("Initialize(false) never enables VCC") {
@@ -146,6 +202,33 @@ TEST_CASE("DrawPixel sets a 1x1 window and sends the colour high byte first") {
   CHECK(spi.transactions[2].bytes == bytes({0xF8, 0x1F}));
 }
 
+TEST_CASE("Pixels go out in the panel's blue-green-red order, hardware shapes take red as colour A") {
+  // NKK Application Notes rev H section 9: pixel word B4..B0 G5..G0 R4..R0, high byte first. The init tables set
+  // A0h bit 2 = 0, so colour C (first 5 bits) is blue and colour A (last 5 bits) is red (SSD1331 rev 1.2 Table 9).
+  CHECK_EQ(isf15acp4::ssd1331::ToPanelPixel(isf15acp4::colors::Red), 0x001Fu);
+  CHECK_EQ(isf15acp4::ssd1331::ToPanelPixel(isf15acp4::colors::Blue), 0xF800u);
+  CHECK_EQ(isf15acp4::ssd1331::ToPanelPixel(isf15acp4::colors::Green), 0x07E0u);
+
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  REQUIRE(display.Initialize());
+  spi.clear();
+  REQUIRE(display.DrawPixel(1, 1, isf15acp4::colors::Red));
+  CHECK(spi.transactions.back().bytes == bytes({0x00, 0x1F}));
+
+  auto gfx = display.CreateGraphicsContext();
+  gfx.Clear(isf15acp4::colors::Red);
+  spi.clear();
+  REQUIRE(display.Present(gfx));
+  CHECK(spi.transactions.back().bytes[0] == 0x00);
+  CHECK(spi.transactions.back().bytes[1] == 0x1F);
+
+  // 21h colours C, B, A on a 6-bit scale: red is A, the last byte.
+  spi.clear();
+  REQUIRE(display.DrawLine({0, 0}, {95, 63}, isf15acp4::colors::Red));
+  CHECK(spi.commands().back() == bytes({0x21, 0, 0, 95, 63, 0x00, 0x00, 0x3E}));
+}
+
 TEST_CASE("Hardware line and filled rectangle send their geometry and colour bytes") {
   isf15acp4_test::MockSpi spi;
   Display display(&spi);
@@ -173,6 +256,96 @@ TEST_CASE("Present uploads the whole 12288-byte frame") {
   spi.clear();
   REQUIRE(display.Present(gfx));
   REQUIRE(!spi.transactions.empty());
+  CHECK(spi.transactions.back().data);
+  CHECK_EQ(spi.transactions.back().bytes.size(), std::size_t{12288});
+}
+
+TEST_CASE("Present sends every pixel high byte first, whatever the CPU byte order") {
+  // SSD1331 rev 1.2 section 7.5.2, Table 9: in 65k colour the first byte of a pixel is its high byte.
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  REQUIRE(display.Initialize());
+  auto gfx = display.CreateGraphicsContext();
+  gfx.Clear(isf15acp4::colors::White);
+  gfx.SetPixel(0, 0, 0xFFE0);   // first pixel in the frame
+  gfx.SetPixel(95, 63, 0xFFE0);  // last pixel
+  spi.clear();
+  REQUIRE(display.Present(gfx));
+  const auto& frame = spi.transactions.back().bytes;
+  REQUIRE(frame.size() == 12288);
+  // Yellow 0xFFE0 is 0x07FF in the panel's blue-green-red order (see the red/blue test below).
+  CHECK(frame[0] == 0x07);
+  CHECK(frame[1] == 0xFF);
+  CHECK(frame[12286] == 0x07);
+  CHECK(frame[12287] == 0xFF);
+  CHECK_EQ(spi.open_transactions, 0);
+}
+
+TEST_CASE("WriteColors needs Initialize() and a buffer, and uses one data transaction") {
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  const isf15acp4::Color565 px[3] = {0xFFE0, 0x07FF, 0xFFFF};
+  CHECK(!display.WriteColors(px, 3));
+  CHECK(display.HasError(isf15acp4::Error::NotInitialized));
+  REQUIRE(display.Initialize());
+  CHECK(!display.WriteColors(nullptr, 3));
+  CHECK(!display.WriteColors(px, 0));
+  spi.clear();
+  REQUIRE(display.WriteColors(px, 3));
+  REQUIRE(spi.transactions.size() == 1);
+  CHECK(spi.transactions[0].data);
+  CHECK(spi.transactions[0].bytes == bytes({0x07, 0xFF, 0xFF, 0xE0, 0xFF, 0xFF}));
+}
+
+TEST_CASE("A HardwareDirect context from CreateGraphicsContext() draws on the display without ConfigurePresenter") {
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi, isf15acp4::SmartDisplayConfig{.graphics = isf15acp4::GraphicsBackend::HardwareDirect});
+  REQUIRE(display.Initialize());
+  auto gfx = display.CreateGraphicsContext();
+  spi.clear();
+  gfx.DrawHLine(0, 10, 5, isf15acp4::colors::White);
+  const auto cmds = spi.commands();
+  REQUIRE(!cmds.empty());
+  CHECK(cmds.back() == bytes({0x21, 0, 5, 10, 5, 0x3E, 0x3F, 0x3E}));
+  CHECK(gfx.GetPixel(0, 5) == isf15acp4::colors::Black);  // nothing went to the canvas
+
+  // A const display hands out an unbound context; ConfigurePresenter() binds it.
+  const Display& const_display = display;
+  auto unbound = const_display.CreateGraphicsContext();
+  spi.clear();
+  unbound.DrawHLine(0, 10, 5, isf15acp4::colors::White);
+  CHECK(spi.transactions.empty());
+  display.ConfigurePresenter(unbound);
+  unbound.DrawHLine(0, 10, 5, isf15acp4::colors::White);
+  CHECK(!spi.transactions.empty());
+}
+
+TEST_CASE("ConfigureScroll stops scrolling before 27h, StopScroll rewrites the RAM") {
+  // SSD1331 rev 1.2 Table 10: 27h parameters must not change while scrolling is active; after 2Eh the RAM must be
+  // rewritten. NKK Application Notes rev H section 12 / Table 7.
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  REQUIRE(display.Initialize());
+  spi.clear();
+  REQUIRE(display.ConfigureScroll(1, 0, 64, 0, 0, true));
+  auto cmds = spi.commands();
+  REQUIRE(cmds.size() == 3);
+  CHECK(cmds[0] == bytes({0x2E}));
+  CHECK(cmds[1] == bytes({0x27, 1, 0, 64, 0, 0}));
+  CHECK(cmds[2] == bytes({0x2F}));
+
+  spi.clear();
+  REQUIRE(display.ConfigureScroll(2, 0, 64, 0, 1, false));
+  cmds = spi.commands();
+  REQUIRE(cmds.size() == 2);
+  CHECK(cmds[0] == bytes({0x2E}));
+  CHECK(cmds[1] == bytes({0x27, 2, 0, 64, 0, 1}));
+
+  auto gfx = display.CreateGraphicsContext();
+  spi.clear();
+  REQUIRE(display.StopScroll(gfx));
+  REQUIRE(!spi.transactions.empty());
+  CHECK(spi.transactions.front().bytes == bytes({0x2E}));
   CHECK(spi.transactions.back().data);
   CHECK_EQ(spi.transactions.back().bytes.size(), std::size_t{12288});
 }
