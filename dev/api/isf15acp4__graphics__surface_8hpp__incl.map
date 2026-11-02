@@ -1,0 +1,11 @@
+<map id="inc/isf15acp4_graphics_surface.hpp" name="inc/isf15acp4_graphics_surface.hpp">
+<area shape="rect" id="Node000001" title="Pluggable graphics surface interface for interchangeable render backends." alt="" coords="14,5,185,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="12,167,83,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,48,33,68,12,94,8,110,11,125,29,155,24,158,6,127,3,110,7,92,29,64,58,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="118,167,185,192"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="142,43,170,64,193,92,197,110,193,127,175,158,171,155,188,125,192,110,188,94,167,68,139,48"/>
+<area shape="rect" id="Node000004" href="$isf15acp4__types_8hpp.html" title="Shared types, constants, and color utilities for NKK SmartDisplay OLED drivers." alt="" coords="22,93,178,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="102,46,102,79,97,79,97,46"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="93,121,67,157,62,154,89,117"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="111,117,137,154,133,157,106,121"/>
+</map>

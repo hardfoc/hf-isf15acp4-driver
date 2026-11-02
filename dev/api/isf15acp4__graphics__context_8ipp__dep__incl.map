@@ -1,0 +1,12 @@
+<map id="src/isf15acp4_graphics_context.ipp" name="src/isf15acp4_graphics_context.ipp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="40,5,211,45"/>
+<area shape="rect" id="Node000002" href="$isf15acp4__graphics__context_8hpp.html" title="Runtime&#45;selectable graphics backend for SmartDisplay applications." alt="" coords="40,93,211,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,59,128,93,123,93,123,59"/>
+<area shape="rect" id="Node000003" href="$isf15acp4_8hpp.html" title="Hardware&#45;agnostic driver for NKK SmartDisplay OLED pushbuttons and displays." alt="" coords="90,269,226,295"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="60,142,34,159,15,183,8,202,15,220,30,237,48,250,91,268,89,273,45,255,26,241,10,223,3,202,10,180,31,155,57,137"/>
+<area shape="rect" id="Node000004" href="$isf15acp4__animator_8hpp.html" title="Frame sequencer and procedural animation helpers for SmartDisplay." alt="" coords="25,189,226,214"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="128,147,128,188,123,188,123,147"/>
+<area shape="rect" id="Node000005" href="$isf15acp4__button__ui_8hpp.html" title="High&#45;level button + display interaction patterns for SmartDisplay." alt="" coords="251,181,408,221"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="184,136,286,179,284,184,182,141"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="277,229,184,272,182,267,275,225"/>
+</map>

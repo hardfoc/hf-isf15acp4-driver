@@ -1,0 +1,17 @@
+<map id="inc/isf15acp4_canvas.hpp" name="inc/isf15acp4_canvas.hpp">
+<area shape="rect" id="Node000001" title="Software framebuffer and 2D drawing primitives for SmartDisplay OLEDs." alt="" coords="84,5,273,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="65,225,135,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,33,118,51,79,78,41,112,12,153,10,172,19,189,37,205,59,217,57,222,34,209,15,193,4,173,7,151,37,108,75,73,116,47,151,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="243,225,309,251"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="275,28,319,46,340,60,357,77,373,102,379,126,375,151,364,179,344,203,319,221,316,217,340,199,359,176,370,150,373,126,368,104,353,80,336,64,317,51,273,33"/>
+<area shape="rect" id="Node000004" href="$isf15acp4__types_8hpp.html" title="Shared types, constants, and color utilities for NKK SmartDisplay OLED drivers." alt="" coords="22,152,178,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,32,136,80,110,140,105,138,131,77,166,29"/>
+<area shape="rect" id="Node000005" href="$isf15acp4__canvas_8ipp.html" title=" " alt="" coords="145,79,343,104"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="191,29,226,67,222,70,188,33"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="103,178,103,212,97,212,97,178"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="129,175,236,218,234,222,127,180"/>
+<area shape="rect" id="Node000006" href="$isf15acp4__font_8hpp.html" title="Compact 5x7 bitmap font for SmartDisplay text rendering." alt="" coords="203,152,349,177"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="252,103,268,139,263,141,247,105"/>
+<area shape="poly" id="edge8_Node000006_Node000002" title=" " alt="" coords="249,180,143,222,141,218,247,175"/>
+<area shape="poly" id="edge9_Node000006_Node000003" title=" " alt="" coords="279,178,279,212,273,212,273,178"/>
+</map>
