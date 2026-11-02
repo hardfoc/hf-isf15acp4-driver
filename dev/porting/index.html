@@ -1363,7 +1363,7 @@
 <h1 id="porting">Porting<a class="headerlink" href="#porting" title="Permanent link">&para;</a></h1>
 <p>Run the driver on a new MCU by writing one class: the SPI interface.</p>
 <p>The driver never calls your SDK directly. It calls eight methods on a class you derive from
-<code>isf15acp4::SpiInterface&lt;Self&gt;</code> (in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a>). The
+<code>isf15acp4::SpiInterface&lt;Self&gt;</code> (in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a>). The
 base class uses CRTP: the calls are resolved at compile time, so there are no virtual functions, no vtable and
 nothing to allocate.</p>
 <figure class="hf-figure">
@@ -1374,7 +1374,7 @@ nothing to allocate.</p>
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom. Your application draws into a GraphicsContext and calls one SmartDisplay<SpiType> object, whose public calls (listed from inc/isf15acp4.hpp) initialise the SSD1331 controller, upload frames, run its hardware drawing commands and read the switch. Each call becomes command and data transactions. The communication interface (SpiInterface in inc/isf15acp4_spi_interface.hpp) is a CRTP base that forwards them to your class. The platform port is the only code you write: a class that writes SPI bytes with D/C and SS, sets the control pins, reads the switch and waits. Below it is the hardware.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/inc/isf15acp4.hpp"><code>inc/isf15acp4.hpp</code></a> <code>SmartDisplay public calls</code>; <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/inc/isf15acp4.hpp"><code>inc/isf15acp4.hpp</code></a> <code>SmartDisplay public calls</code>; <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
 </details>
 <h2 id="what-you-implement">What you implement<a class="headerlink" href="#what-you-implement" title="Permanent link">&para;</a></h2>
 <table>
@@ -1415,7 +1415,7 @@ nothing to allocate.</p>
 </tr>
 <tr>
 <td><code>DelayUs(us)</code></td>
-<td>Wait at least that long (the driver uses 3 and 1000)</td>
+<td>Wait at least that long (the driver uses 3, 10 and 1000)</td>
 </tr>
 </tbody>
 </table>
@@ -1447,7 +1447,7 @@ nothing to allocate.</p>
 </span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">pin</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="no">isf15acp4</span><span class="o">::</span><span class="no">CtrlPin</span><span class="o">::</span><span class="no">ChipSelect</span><span class="p">:</span><span class="w">  </span><span class="n">platform_gpio_write</span><span class="p">(</span><span class="n">kCs</span><span class="p">,</span><span class="w"> </span><span class="o">!</span><span class="n">active</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w">   </span><span class="c1">// SS active low</span>
 </span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="no">isf15acp4</span><span class="o">::</span><span class="no">CtrlPin</span><span class="o">::</span><span class="no">DataCommand</span><span class="p">:</span><span class="w"> </span><span class="n">platform_gpio_write</span><span class="p">(</span><span class="n">kDc</span><span class="p">,</span><span class="w"> </span><span class="n">active</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w">    </span><span class="c1">// high = data</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="no">isf15acp4</span><span class="o">::</span><span class="no">CtrlPin</span><span class="o">::</span><span class="no">Reset</span><span class="p">:</span><span class="w">       </span><span class="n">platform_gpio_write</span><span class="p">(</span><span class="n">kRes</span><span class="p">,</span><span class="w"> </span><span class="n">active</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w">   </span><span class="c1">// see Porting: ACTIVE = high</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="no">isf15acp4</span><span class="o">::</span><span class="no">CtrlPin</span><span class="o">::</span><span class="no">Reset</span><span class="p">:</span><span class="w">       </span><span class="n">platform_gpio_write</span><span class="p">(</span><span class="n">kRes</span><span class="p">,</span><span class="w"> </span><span class="o">!</span><span class="n">active</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w">  </span><span class="c1">// RES# active low</span>
 </span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="no">isf15acp4</span><span class="o">::</span><span class="no">CtrlPin</span><span class="o">::</span><span class="no">VccEnable</span><span class="p">:</span><span class="w">   </span><span class="n">platform_gpio_write</span><span class="p">(</span><span class="n">kVccEn</span><span class="p">,</span><span class="w"> </span><span class="n">active</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
 </span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">      </span><span class="k">case</span><span class="w"> </span><span class="no">isf15acp4</span><span class="o">::</span><span class="no">CtrlPin</span><span class="o">::</span><span class="no">Switch</span><span class="p">:</span><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w">                                      </span><span class="c1">// input only</span>
 </span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">    </span><span class="p">}</span>
@@ -1471,8 +1471,8 @@ nothing to allocate.</p>
 <p>Rules the transfer must follow:</p>
 <ul>
 <li><strong>SPI mode 0</strong> (mode 3 also meets the datasheet), MSB first, at most 6.6 MHz.</li>
-<li><strong>One SS-low transaction per Begin / End pair.</strong> The driver calls <code>WriteBytes()</code> once or twice inside it (the
-  opcode, then its parameters); keep SS low across both.</li>
+<li><strong>One SS-low transaction per Begin / End pair.</strong> The driver calls <code>WriteBytes()</code> one or more times inside it (a
+  command's opcode, then its parameters; a frame in chunks of up to 128 bytes); keep SS low across all of them.</li>
 <li><strong>Blocking writes.</strong> <code>WriteBytes()</code> must not return while bytes are still queued: <code>EndTransaction()</code> raises SS
   right after it, and the display drops a byte cut short. With DMA, wait for completion.</li>
 <li><strong>No MISO.</strong> The display has no data output; leave MISO unconnected or free for other devices.</li>
@@ -1501,8 +1501,8 @@ nothing to allocate.</p>
 </tr>
 <tr>
 <td><code>Reset</code></td>
-<td><code>Inactive</code> 3 µs, then <code>Active</code></td>
-<td><strong>High</strong>: see below</td>
+<td><code>Active</code> 3 µs, then <code>Inactive</code></td>
+<td>Low (RES# held in reset)</td>
 </tr>
 <tr>
 <td><code>VccEnable</code></td>
@@ -1516,22 +1516,17 @@ nothing to allocate.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition warning">
-<p class="admonition-title">Reset ends <code>Active</code></p>
-<p>The header describes RES as an active-low pulse, but in this release <code>Initialize()</code> drives <code>Reset</code> to
-<code>Inactive</code>, waits 3 µs and leaves it <code>Active</code>. A port that maps <code>Active</code> to low holds the controller in reset
-after <code>Initialize()</code> returns <code>true</code>, and the screen stays dark. Map <code>Active</code> to high (as the port above does)
-until the driver is fixed. The ESP32 example adapter maps it to low; see
-<a href="../troubleshooting/#screen-stays-dark-after-initialize-returns-true">Troubleshooting</a>.</p>
-</div>
+<p><code>Reset</code> follows the other pins: <code>Active</code> is the asserted level, which for RES# is low. <code>Initialize()</code> drives it
+<code>Active</code> for at least 3 µs, then <code>Inactive</code> (high), and waits 10 µs before the first command (SSD1331 power-on
+sequence, reset completion 2 µs maximum).</p>
 <h2 id="reference-implementation">Reference implementation<a class="headerlink" href="#reference-implementation" title="Permanent link">&para;</a></h2>
-<p>The ESP32 examples use <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/examples/esp32/main/esp32_isf15acp4_spi_adapter.hpp"><code>esp32_isf15acp4_spi_adapter.hpp</code></a>:
+<p>The ESP32 examples use <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/examples/esp32/main/esp32_isf15acp4_spi_adapter.hpp"><code>esp32_isf15acp4_spi_adapter.hpp</code></a>:
 an ESP-IDF <code>spi_master</code> device in mode 0 with SS as a GPIO, <code>spi_device_polling_transmit()</code> for blocking writes,
 an input with pull-up for the switch and <code>esp_rom_delay_us()</code> / <code>vTaskDelay()</code> for delays. Start from it for any
-ESP-IDF target, with the reset mapping fixed as above.</p>
+ESP-IDF target.</p>
 <h2 id="check-your-port">Check your port<a class="headerlink" href="#check-your-port" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Build it: the port on this page is compiled by the host CI from <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/tests/docs/my_spi.hpp"><code>tests/docs/</code></a>, with
+<li>Build it: the port on this page is compiled by the host CI from <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/tests/docs/my_spi.hpp"><code>tests/docs/</code></a>, with
    the driver instantiated over it.</li>
 <li>With a logic analyser on SS, D/C and SCK, call <code>Initialize()</code>: you should see 21 command transactions (the init
    table) and two window commands, each with SS low around its bytes, and RES high at the end.</li>

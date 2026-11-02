@@ -638,6 +638,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="CMake">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installed-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installed package
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1311,6 +1328,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="CMake">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installed-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installed package
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1424,10 +1458,19 @@ version header, and requires C++20 (<code>cxx_std_20</code>), so your target doe
 </tr>
 </tbody>
 </table>
-<p>The root <code>CMakeLists.txt</code> also has <code>install()</code> rules and a <code>hf_isf15acp4Config.cmake</code> package. The installed
-headers do not include <code>src/*.ipp</code>, which they need, so use <code>add_subdirectory()</code> until that is fixed.</p>
+<h3 id="installed-package">Installed package<a class="headerlink" href="#installed-package" title="Permanent link">&para;</a></h3>
+<p>The root <code>CMakeLists.txt</code> installs the static library, the headers with the <code>.ipp</code> files they include and the
+generated version header, and a <code>hf_isf15acp4Config.cmake</code> package:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cmake<span class="w"> </span>--install<span class="w"> </span>build<span class="w"> </span>--prefix<span class="w"> </span>/opt/hardfoc
+</span></code></pre></div>
+<div class="language-cmake highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">find_package</span><span class="p">(</span><span class="s">hf_isf15acp4</span><span class="w"> </span><span class="s">1</span><span class="w"> </span><span class="s">REQUIRED</span><span class="w"> </span><span class="s">CONFIG</span><span class="p">)</span><span class="w">    </span><span class="c"># CMAKE_PREFIX_PATH=/opt/hardfoc</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">my_app</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">hf::isf15acp4</span><span class="p">)</span>
+</span></code></pre></div>
+<p>The headers go to <code>include/hf_isf15acp4/inc/</code> and the <code>.ipp</code> files to <code>include/hf_isf15acp4/src/</code>, the same layout
+as the source tree; the target adds <code>include/hf_isf15acp4/inc</code> to your include path. The host test
+<code>hf_isf15acp4_install_package</code> installs into the build tree and builds a consumer against it.</p>
 <h2 id="esp-idf">ESP-IDF<a class="headerlink" href="#esp-idf" title="Permanent link">&para;</a></h2>
-<p>The ESP-IDF component wrapper is <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/examples/esp32/components/hf_isf15acp4/CMakeLists.txt"><code>examples/esp32/components/hf_isf15acp4/</code></a>.
+<p>The ESP-IDF component wrapper is <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/examples/esp32/components/hf_isf15acp4/CMakeLists.txt"><code>examples/esp32/components/hf_isf15acp4/</code></a>.
 Copy that folder into your project's <code>components/</code> (or point <code>EXTRA_COMPONENT_DIRS</code> at it) and set the
 <code>HF_ISF15ACP4_ROOT</code> cache variable to the driver checkout; the wrapper stops with a clear message when the path is
 wrong. Your component then declares <code>REQUIRES hf_isf15acp4</code>. The wrapper also brings the example's Kconfig menu
@@ -1446,22 +1489,22 @@ time), or provide your own with the four <code>HF_ISF15ACP4_VERSION_*</code> mac
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/cmake/hf_isf15acp4_build_settings.cmake">Settings</a></td>
+<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/cmake/hf_isf15acp4_build_settings.cmake">Settings</a></td>
 <td>Sources, include directories, version: the single source of truth</td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/CMakeLists.txt">Library</a></td>
+<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/CMakeLists.txt">Library</a></td>
 <td>Static library for host builds and CI</td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/examples/esp32/components/hf_isf15acp4/CMakeLists.txt">ESP-IDF</a></td>
+<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/examples/esp32/components/hf_isf15acp4/CMakeLists.txt">ESP-IDF</a></td>
 <td>Component wrapper over the same settings</td>
 </tr>
 </tbody>
 </table>
 <p>The version is set once in the settings file (<code>cmake/hf_isf15acp4_build_settings.cmake</code>) and written into
 <code>isf15acp4_version.h</code> at configure time. Read it at run time:</p>
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isf15acp4</span><span class="o">::</span><span class="n">SmartDisplay</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;::</span><span class="n">GetDriverVersion</span><span class="p">();</span><span class="w">   </span><span class="c1">// "1.0.0"</span>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isf15acp4</span><span class="o">::</span><span class="n">SmartDisplay</span><span class="o">&lt;</span><span class="n">MySpi</span><span class="o">&gt;::</span><span class="n">GetDriverVersion</span><span class="p">();</span><span class="w">   </span><span class="c1">// "1.0.0"</span>
 </span></code></pre></div>
 <h2 id="next">Next<a class="headerlink" href="#next" title="Permanent link">&para;</a></h2>
 <p><a href="../quickstart/">Quickstart</a> wires the button and shows text; <a href="../porting/">Porting</a> writes the SPI interface for

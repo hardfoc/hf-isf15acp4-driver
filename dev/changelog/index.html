@@ -1172,6 +1172,39 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#documentation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1183,7 +1216,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#added" class="md-nav__link">
+  <a href="#added_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Added
@@ -1253,6 +1286,39 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#documentation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1264,7 +1330,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#added" class="md-nav__link">
+  <a href="#added_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Added
@@ -1308,6 +1374,53 @@
 <p>What changed in each release of the driver. Entries marked <strong>BREAKING</strong> need source changes in code that used the
 affected API.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="breaking-changes">Breaking changes<a class="headerlink" href="#breaking-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>BREAKING</strong> <code>CtrlPin::Reset</code> now means "held in reset": <code>Initialize()</code> drives it <code>Active</code> for at least 3 µs, then
+  <code>Inactive</code>, and leaves it <code>Inactive</code> (SSD1331 rev 1.2 section 7.9, Table 18). Map <code>Active</code> to the low RES# level,
+  like <code>ChipSelect</code>. Ports that followed the earlier workaround (<code>Active</code> = high) must invert their <code>Reset</code> mapping;
+  the ESP32 example adapter already maps it this way.</li>
+<li><strong>BREAKING</strong> <code>Present()</code>, <code>DrawCanvas()</code> and <code>FillScreen()</code> now send each pixel high byte first on every CPU
+  (SSD1331 rev 1.2 section 7.5.2, Table 9). Remove any byte swap added around <code>Present()</code> as a workaround, or it
+  swaps the frame back.</li>
+<li><strong>BREAKING</strong> Pixel data (<code>Present()</code>, <code>DrawCanvas()</code>, <code>FillScreen()</code>, <code>DrawPixel()</code>, <code>WriteColors()</code>) is now
+  converted from RGB565 to the panel's blue-green-red word, so red and blue are no longer swapped against the
+  hardware line and rectangle commands (NKK Application Notes rev H section 9). Code that pre-swapped red and blue
+  to compensate must stop. <code>WritePixels()</code> still sends raw bytes: convert them with <code>ssd1331::ToPanelPixel()</code>.</li>
+</ul>
+<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>SmartDisplay::WriteColors(colors, count)</code> streams <code>Color565</code> pixels in the controller's byte order.
+  <code>WritePixels()</code> still sends raw bytes unchanged.</li>
+<li><code>SmartDisplay::StopScroll()</code> stops hardware scrolling (<code>2Eh</code>); <code>StopScroll(gfx)</code> also rewrites the display RAM
+  with <code>Present(gfx)</code>, as the SSD1331 requires after <code>2Eh</code>.</li>
+<li><code>ssd1331::ToPanelPixel(color)</code> converts a <code>Color565</code> to the panel's pixel word.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The reset pulse left RES# low with an active-low port, so the controller stayed in reset. The driver now asserts
+  RES# for at least 3 µs, releases it and waits 10 µs (reset completion is 2 µs maximum) before the first command.</li>
+<li>Frames went out in memory order, low byte first on little-endian MCUs (ESP32, Arm Cortex-M, x86), so colours
+  were wrong after <code>Present()</code>. The canvas upload and the hardware-direct flush hook now serialise each pixel high
+  byte first.</li>
+<li>Pixels drawn through the frame or <code>DrawPixel()</code> showed red as blue and blue as red: the NKK init tables select
+  the normal colour order (A0h bit 2 = 0), in which the pixel word's high 5 bits are colour C, blue on these
+  panels. <code>DrawLine()</code> and <code>DrawRectangle()</code> already sent red as colour A and were correct.</li>
+<li><code>ProductVariant::Isc15anp4</code> and <code>Isc01p</code> failed <code>Initialize()</code> with <code>Error::OutOfRange</code>: <code>SetFullWindow()</code>
+  passed RAM addresses (<code>10h</code>..<code>4Fh</code>, <code>16h</code>..<code>49h</code>) to <code>SetWindow()</code>, which checks display coordinates.
+  <code>SetWindow()</code>, <code>DrawLine()</code>, <code>DrawRectangle()</code> and <code>ClearWindow()</code> now take display coordinates and add the
+  variant's RAM offset (NKK Application Notes rev H, Tables 4 and 5).</li>
+<li>With <code>GraphicsBackend::HardwareDirect</code>, <code>Initialize()</code> bound the display to a temporary context, so contexts
+  from <code>CreateGraphicsContext()</code> drew into RAM and nothing reached the panel. <code>CreateGraphicsContext()</code> on a
+  non-const display now returns a bound context; a <code>const</code> display still returns an unbound one.</li>
+<li><code>ConfigureScroll()</code> sent new <code>27h</code> parameters while scrolling could be running, and with <code>activate = false</code> sent
+  <code>27h</code> before <code>2Eh</code>. It now always sends <code>2Eh</code> first, then <code>27h</code>, then <code>2Fh</code> only when activating (SSD1331 rev 1.2
+  Table 10, <code>27h</code> note 2).</li>
+<li><code>cmake --install</code> produced an unusable package: the headers were installed without the <code>src/*.ipp</code> files they
+  include, and the exported target was <code>hf::hf_isf15acp4</code> instead of <code>hf::isf15acp4</code>. Headers now install to
+  <code>include/hf_isf15acp4/inc/</code>, the <code>.ipp</code> files to <code>include/hf_isf15acp4/src/</code>, and <code>find_package(hf_isf15acp4)</code>
+  provides <code>hf::isf15acp4</code>.</li>
+</ul>
 <h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The documentation site moved to the HardFOC MkDocs platform: new page set (quickstart, hardware, architecture,
@@ -1318,7 +1431,7 @@ affected API.</p>
   and the panel's pixels are 0.222 mm x 0.293 mm.</li>
 <li>Removed the illustrations whose pinout and wiring did not match the part.</li>
 </ul>
-<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Host unit tests (<code>HF_ISF15ACP4_BUILD_TESTS</code>) that run the driver against a recording SPI port.</li>
 </ul>

@@ -1042,10 +1042,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#red-and-blue-swapped-in-hardware-shapes" class="md-nav__link">
+  <a href="#red-and-blue-swapped" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Red and blue swapped in hardware shapes
+        Red and blue swapped
       
     </span>
   </a>
@@ -1347,10 +1347,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#red-and-blue-swapped-in-hardware-shapes" class="md-nav__link">
+  <a href="#red-and-blue-swapped" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Red and blue swapped in hardware shapes
+        Red and blue swapped
       
     </span>
   </a>
@@ -1442,7 +1442,7 @@ most questions in minutes.</p>
 <tbody>
 <tr>
 <td>RES is low after <code>Initialize()</code></td>
-<td>Map <code>Reset</code> <code>Active</code> to high (<a href="../porting/#control-pins">Porting</a>); the ESP32 example port needs this</td>
+<td>Map <code>Reset</code> <code>Active</code> to low, <code>Inactive</code> to high (<a href="../porting/#control-pins">Porting</a>)</td>
 </tr>
 <tr>
 <td>VCC (pin 9) is not 14 V to 16 V</td>
@@ -1490,23 +1490,31 @@ most questions in minutes.</p>
 </tr>
 <tr>
 <td><code>OutOfRange</code></td>
-<td>See the next section</td>
+<td>A window outside the visible area: see the next section</td>
 </tr>
 </tbody>
 </table>
 <h2 id="initialize-fails-with-outofrange"><code>Initialize()</code> fails with <code>OutOfRange</code><a class="headerlink" href="#initialize-fails-with-outofrange" title="Permanent link">&para;</a></h2>
-<p>You selected <code>ProductVariant::Isc15anp4</code> or <code>Isc01p</code>. Their visible area starts at a column offset, and in this
-release <code>SetWindow()</code> rejects the full window as wider than the panel. Only <code>Isf15acp4</code> initialises
+<p><code>SetWindow()</code> takes display coordinates and rejects a rectangle that goes past the variant's visible area
+(96 x 64, 64 x 48 or 52 x 36). Do not add the ISC15ANP4 or ISC01P column offset yourself: the driver does
 (<a href="../hardware/#product-variants">Hardware</a>).</p>
 <h2 id="colours-wrong-after-present">Colours wrong after <code>Present()</code><a class="headerlink" href="#colours-wrong-after-present" title="Permanent link">&para;</a></h2>
-<p>Shapes and text are in the right place but the colours are not, while <code>DrawPixel()</code>, <code>DrawLine()</code> and
-<code>FillScreen(colors::White)</code> look right: the frame went out low byte first. The SSD1331 takes each pixel high byte
-first, and <code>Present()</code> sends the canvas in memory order, which is low byte first on ESP32, Arm Cortex-M and x86.
-Swap the bytes around the upload (<a href="../graphics/#colours">Graphics</a>).</p>
-<h2 id="red-and-blue-swapped-in-hardware-shapes">Red and blue swapped in hardware shapes<a class="headerlink" href="#red-and-blue-swapped-in-hardware-shapes" title="Permanent link">&para;</a></h2>
-<p><code>DrawLine()</code> and <code>DrawRectangle()</code> send the colour as three components (C, B, A). Compare one against
-<code>DrawPixel()</code> in the same colour: if red and blue differ between them, draw that shape in the canvas instead
-(<code>GraphicsContext::DrawHLine()</code>, <code>FillRect()</code>) until the driver is fixed.</p>
+<p>Shapes and text are in the right place but the colours are not. The driver sends each pixel high byte first on
+any CPU, so check your own code:</p>
+<ul>
+<li>Remove any byte swap added around <code>Present()</code> for earlier releases: it now swaps the frame back.</li>
+<li><code>WritePixels()</code> sends your bytes unchanged. For <code>Color565</code> buffers use <code>WriteColors()</code>
+  (<a href="../api-guide/#write-pixels-yourself">API guide</a>).</li>
+</ul>
+<h2 id="red-and-blue-swapped">Red and blue swapped<a class="headerlink" href="#red-and-blue-swapped" title="Permanent link">&para;</a></h2>
+<p>The panel stores pixels as blue, green, red, and the driver converts every <code>Color565</code> it sends. If red shows as
+blue in one kind of drawing only, check:</p>
+<ul>
+<li>Raw <code>WritePixels()</code> bytes: they go out unchanged, so convert each colour with <code>ssd1331::ToPanelPixel()</code> or use
+  <code>WriteColors()</code>.</li>
+<li>A remap value (<code>A0h</code>) changed from the NKK initialisation table: bit 2 selects the colour order. Keep the
+  table's value.</li>
+</ul>
 <h2 id="image-stretched-or-offset">Image stretched or offset<a class="headerlink" href="#image-stretched-or-offset" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1568,7 +1576,7 @@ Swap the bytes around the upload (<a href="../graphics/#colours">Graphics</a>).<
 </tr>
 <tr>
 <td>Old content after scrolling stops</td>
-<td>The SSD1331 needs its RAM rewritten: <code>Present()</code> after <code>ConfigureScroll(..., false)</code></td>
+<td>The SSD1331 needs its RAM rewritten: stop with <code>StopScroll(gfx)</code>, or <code>Present()</code> after <code>StopScroll()</code></td>
 </tr>
 <tr>
 <td>Hardware shapes disappear</td>

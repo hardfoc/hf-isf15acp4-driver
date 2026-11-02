@@ -1357,7 +1357,7 @@ Kconfig.</p>
 </table>
 <p>The two-argument constructor <code>SmartDisplay(bus, variant)</code> uses the defaults for the rest.</p>
 <h2 id="initialisation-table">Initialisation table<a class="headerlink" href="#initialisation-table" title="Permanent link">&para;</a></h2>
-<p><code>Initialize()</code> sends the table for the variant from <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/inc/isf15acp4_ssd1331.hpp"><code>inc/isf15acp4_ssd1331.hpp</code></a>.
+<p><code>Initialize()</code> sends the table for the variant from <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/inc/isf15acp4_ssd1331.hpp"><code>inc/isf15acp4_ssd1331.hpp</code></a>.
 For the ISF15ACP4:</p>
 <div class="hf-registers">
 <table>
@@ -1477,7 +1477,7 @@ programming guidance for this part; test any change on the panel.</p>
 </table>
 <h2 id="esp32-example-kconfig">ESP32 example Kconfig<a class="headerlink" href="#esp32-example-kconfig" title="Permanent link">&para;</a></h2>
 <p>The examples read their pins from <code>menuconfig</code> (<strong>HF ISF15ACP4 SmartDisplay</strong>), defined in
-<a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/examples/esp32/components/hf_isf15acp4/Kconfig"><code>Kconfig</code></a>. Every symbol starts with <code>CONFIG_ISF15ACP4_</code>:</p>
+<a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/examples/esp32/components/hf_isf15acp4/Kconfig"><code>Kconfig</code></a>. Every symbol starts with <code>CONFIG_ISF15ACP4_</code>:</p>
 <table>
 <thead>
 <tr>
@@ -1530,7 +1530,7 @@ programming guidance for this part; test any change on the panel.</p>
 </tbody>
 </table>
 <p>The SPI clock is <code>ISF15ACP4_SPI_CLOCK_HZ</code> (6 MHz) in
-<a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/e784656264882bb2da9c9fe2eb42d8c309eca4e4/examples/esp32/main/esp32_isf15acp4_test_config.hpp"><code>esp32_isf15acp4_test_config.hpp</code></a>.</p>
+<a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/examples/esp32/main/esp32_isf15acp4_test_config.hpp"><code>esp32_isf15acp4_test_config.hpp</code></a>.</p>
 <p>Next: <a href="../porting/">Porting</a> writes the port for your MCU.</p>
 
 

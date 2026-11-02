@@ -1604,9 +1604,10 @@ VDD + 0.3 V, so drive the module from MCU I/O at the same voltage as VDD.</p>
 <li>To power off, send display off (<code>AEh</code>), turn VCC off, then VDD (0 µs minimum between them).</li>
 </ol>
 <p>While VCC is off it sits near VDD through the controller's ESD protection; that is expected.</p>
-<p><code>SmartDisplay::Initialize(true)</code> does steps 2 and 3: it drives <code>Reset</code> for 3 µs, sets <code>VccEnable</code> active, waits
-1 ms and sends the initialisation table. With <code>Initialize(false)</code> it leaves VCC alone, for boards that switch the
-supply themselves. The driver has no power-off call: send <code>DisplayOff()</code>, then drop <code>VccEnable</code> from your own code.</p>
+<p><code>SmartDisplay::Initialize(true)</code> does steps 2 and 3: it holds <code>Reset</code> active (RES low) for 3 µs, releases it, waits
+10 µs, sets <code>VccEnable</code> active, waits 1 ms and sends the initialisation table. With <code>Initialize(false)</code> it leaves
+VCC alone, for boards that switch the supply themselves. The driver has no power-off call: send <code>DisplayOff()</code>,
+then drop <code>VccEnable</code> from your own code.</p>
 <h2 id="switch">Switch<a class="headerlink" href="#switch" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1715,12 +1716,9 @@ repository is tested only with the ISF15ACP4.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition warning">
-<p class="admonition-title">Only <code>Isf15acp4</code> initialises in this release</p>
-<p>For the two smaller parts the full window starts at a column offset (16 and 22), and <code>SetWindow()</code> rejects any
-column past the visible width, so <code>Initialize()</code> fails with <code>Error::OutOfRange</code>. See
-<a href="../troubleshooting/#initialize-fails-with-outofrange">Troubleshooting</a>.</p>
-</div>
+<p>The two smaller parts show a window of the controller's 96 x 64 RAM that starts at column 16 (<code>10h</code>, ISC15ANP4)
+or 22 (<code>16h</code>, ISC01P), per the NKK application notes. Every driver call takes display coordinates, 0 to width - 1
+and 0 to height - 1, and adds that offset itself.</p>
 <h2 id="mounting-and-handling">Mounting and handling<a class="headerlink" href="#mounting-and-handling" title="Permanent link">&para;</a></h2>
 <ul>
 <li>The module is static sensitive: handle it at an ESD-safe bench.</li>
