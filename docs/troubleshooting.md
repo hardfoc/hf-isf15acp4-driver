@@ -26,12 +26,12 @@ most questions in minutes.
 | `NotInitialized` | Your `EnsureInitialized()` returned `false`: the SPI bus or GPIO set-up failed |
 | `SpiWrite` | `BeginCommand()` or `WriteBytes()` returned `false` |
 | `InvalidParam` | The driver was constructed with a null port pointer |
-| `OutOfRange` | See the next section |
+| `OutOfRange` | A window outside the visible area: see the next section |
 
 ## `Initialize()` fails with `OutOfRange`
 
-You selected `ProductVariant::Isc15anp4` or `Isc01p`. Their visible area starts at a column offset, and in this
-release `SetWindow()` rejects the full window as wider than the panel. Only `Isf15acp4` initialises
+`SetWindow()` takes display coordinates and rejects a rectangle that goes past the variant's visible area
+(96 x 64, 64 x 48 or 52 x 36). Do not add the ISC15ANP4 or ISC01P column offset yourself: the driver does
 ([Hardware](hardware.md#product-variants)).
 
 ## Colours wrong after `Present()`

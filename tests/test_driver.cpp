@@ -42,6 +42,45 @@ TEST_CASE("Initialize sends the ISF15ACP4 table, then the full 96x64 window") {
   CHECK_EQ(spi.open_transactions, 0);
 }
 
+TEST_CASE("ISC15ANP4 and ISC01P initialise with their RAM windows, and drawing is offset into them") {
+  // NKK Application Notes rev H, Tables 4 and 5: ISC15ANP4 window 15h 10h 4Fh / 75h 00h 2Fh (64 x 48),
+  // ISC01P window 15h 16h 49h / 75h 00h 23h (52 x 36). Display (0, 0) is RAM column 10h / 16h.
+  struct Case {
+    isf15acp4::ProductVariant variant;
+    uint8_t col0, col1, row1;
+  };
+  for (const Case& c : {Case{isf15acp4::ProductVariant::Isc15anp4, 0x10, 0x4F, 0x2F},
+                        Case{isf15acp4::ProductVariant::Isc01p, 0x16, 0x49, 0x23}}) {
+    isf15acp4_test::MockSpi spi;
+    Display display(&spi, c.variant);
+    REQUIRE(display.Initialize());
+    CHECK(!display.HasError(isf15acp4::Error::OutOfRange));
+    auto cmds = spi.commands();
+    REQUIRE(cmds.size() >= 2);
+    CHECK(cmds[cmds.size() - 2] == bytes({0x15, c.col0, c.col1}));
+    CHECK(cmds[cmds.size() - 1] == bytes({0x75, 0x00, c.row1}));
+
+    spi.clear();
+    REQUIRE(display.DrawPixel(1, 2, isf15acp4::colors::White));
+    CHECK(spi.transactions[0].bytes == bytes({0x15, uint8_t(c.col0 + 1), uint8_t(c.col0 + 1)}));
+    CHECK(spi.transactions[1].bytes == bytes({0x75, 2, 2}));
+
+    const auto& g = display.Geometry();
+    CHECK(!display.SetWindow({0, 0, g.width, 0}));  // one column past the visible area
+    spi.clear();
+    REQUIRE(display.DrawLine({0, 0}, {3, 4}, isf15acp4::colors::Black));
+    REQUIRE(display.ClearWindow({0, 0, 3, 4}));
+    cmds = spi.commands();
+    CHECK(cmds[0] == bytes({0x21, c.col0, 0, uint8_t(c.col0 + 3), 4, 0, 0, 0}));
+    CHECK(cmds[1] == bytes({0x25, c.col0, 0, uint8_t(c.col0 + 3), 4}));
+
+    auto gfx = display.CreateGraphicsContext();
+    spi.clear();
+    REQUIRE(display.Present(gfx));
+    CHECK_EQ(spi.transactions.back().bytes.size(), g.framebuffer_bytes);
+  }
+}
+
 TEST_CASE("Every command and its parameters go in one CS-low transaction") {
   isf15acp4_test::MockSpi spi;
   Display display(&spi);

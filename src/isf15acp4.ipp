@@ -35,7 +35,7 @@ bool presenterFlushCanvas(void* ctx, const Color565* data, std::size_t bytes) no
 template <typename SpiType>
 SmartDisplay<SpiType>::SmartDisplay(SpiType* bus, const SmartDisplayConfig& config) noexcept
     : bus_(bus), config_(config), variant_(config.variant), geometry_(GetGeometry(config.variant)) {
-    window_ = {geometry_.column_start, geometry_.row_start, geometry_.column_end, geometry_.row_end};
+    window_ = {0, 0, static_cast<uint8_t>(geometry_.width - 1), static_cast<uint8_t>(geometry_.height - 1)};
 }
 
 template <typename SpiType>
@@ -184,8 +184,11 @@ bool SmartDisplay<SpiType>::SetWindow(const Rect& rect) noexcept {
         return false;
     }
 
-    const uint8_t col_data[2] = {rect.x0, rect.x1};
-    const uint8_t row_data[2] = {rect.y0, rect.y1};
+    // Display coordinates to controller RAM addresses: the ISC15ANP4 and ISC01P show a window of the 96 x 64 RAM
+    // starting at column 10h / 16h (NKK Application Notes rev H, Tables 4 and 5).
+    const Rect ram = toRam(rect);
+    const uint8_t col_data[2] = {ram.x0, ram.x1};
+    const uint8_t row_data[2] = {ram.y0, ram.y1};
 
     if (!sendCommand(static_cast<uint8_t>(ssd1331::Command::SetColumnAddress), col_data, 2)) {
         return false;
@@ -200,8 +203,13 @@ bool SmartDisplay<SpiType>::SetWindow(const Rect& rect) noexcept {
 
 template <typename SpiType>
 bool SmartDisplay<SpiType>::SetFullWindow() noexcept {
-    return SetWindow({geometry_.column_start, geometry_.row_start, geometry_.column_end,
-                      geometry_.row_end});
+    return SetWindow({0, 0, static_cast<uint8_t>(geometry_.width - 1), static_cast<uint8_t>(geometry_.height - 1)});
+}
+
+template <typename SpiType>
+Rect SmartDisplay<SpiType>::toRam(const Rect& rect) const noexcept {
+    return {static_cast<uint8_t>(rect.x0 + geometry_.column_start), static_cast<uint8_t>(rect.y0 + geometry_.row_start),
+            static_cast<uint8_t>(rect.x1 + geometry_.column_start), static_cast<uint8_t>(rect.y1 + geometry_.row_start)};
 }
 
 template <typename SpiType>
@@ -336,7 +344,8 @@ template <typename SpiType>
 bool SmartDisplay<SpiType>::DrawLine(const Point& start, const Point& end, Color565 color) noexcept {
     uint8_t rgb[3];
     colorToSsd1331(color, rgb);
-    const uint8_t data[7] = {start.x, start.y, end.x, end.y,
+    const Rect ram = toRam({start.x, start.y, end.x, end.y});
+    const uint8_t data[7] = {ram.x0, ram.y0, ram.x1, ram.y1,
                              static_cast<uint8_t>(rgb[2] << 1), rgb[1],
                              static_cast<uint8_t>(rgb[0] << 1)};
     return sendCommand(static_cast<uint8_t>(ssd1331::Command::DrawLine), data, sizeof(data));
@@ -353,7 +362,8 @@ bool SmartDisplay<SpiType>::DrawRectangle(const Rect& rect, Color565 color, bool
 
     uint8_t rgb[3];
     colorToSsd1331(color, rgb);
-    const uint8_t data[10] = {rect.x0, rect.y0, rect.x1, rect.y1,
+    const Rect ram = toRam(rect);
+    const uint8_t data[10] = {ram.x0, ram.y0, ram.x1, ram.y1,
                               static_cast<uint8_t>(rgb[2] << 1), rgb[1],
                               static_cast<uint8_t>(rgb[0] << 1),
                               static_cast<uint8_t>(rgb[2] << 1), rgb[1],
@@ -370,7 +380,8 @@ bool SmartDisplay<SpiType>::DrawRectangle(const Rect& rect, Color565 color, bool
 
 template <typename SpiType>
 bool SmartDisplay<SpiType>::ClearWindow(const Rect& rect) noexcept {
-    const uint8_t data[4] = {rect.x0, rect.y0, rect.x1, rect.y1};
+    const Rect ram = toRam(rect);
+    const uint8_t data[4] = {ram.x0, ram.y0, ram.x1, ram.y1};
     return sendCommand(static_cast<uint8_t>(ssd1331::Command::ClearWindow), data, sizeof(data));
 }
 

@@ -75,7 +75,8 @@ These draw straight into the display RAM. A later `Present()` overwrites them wi
 --8<-- "tests/docs/api_tasks.cpp:raw"
 ```
 
-`SetWindow()` takes inclusive bounds and returns `false` with `Error::OutOfRange` outside 0..95, 0..63.
+`SetWindow()` takes inclusive bounds in display coordinates and returns `false` with `Error::OutOfRange` outside
+the visible area (0..95, 0..63 on the ISF15ACP4); on the smaller variants the driver adds the RAM column offset.
 `WriteColors()` needs `Initialize()` first and sends each `Color565` pixel high byte first, the SSD1331's
 65k-colour order. `WritePixels()` sends raw bytes unchanged, two per pixel already in that format, and needs an even
 byte count. Restore the full window before the next `Present()`; `DrawCanvas()` and `Present()`

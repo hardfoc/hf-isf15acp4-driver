@@ -36,6 +36,10 @@ code that used the affected API; together they call for a major version bump at 
 - Pixels drawn through the frame or `DrawPixel()` showed red as blue and blue as red: the NKK init tables select
   the normal colour order (A0h bit 2 = 0), in which the pixel word's high 5 bits are colour C, blue on these
   panels. `DrawLine()` and `DrawRectangle()` already sent red as colour A and were correct.
+- `ProductVariant::Isc15anp4` and `Isc01p` failed `Initialize()` with `Error::OutOfRange`: `SetFullWindow()`
+  passed RAM addresses (`10h`..`4Fh`, `16h`..`49h`) to `SetWindow()`, which checks display coordinates.
+  `SetWindow()`, `DrawLine()`, `DrawRectangle()` and `ClearWindow()` now take display coordinates and add the
+  variant's RAM offset (NKK Application Notes rev H, Tables 4 and 5).
 
 ### Documentation
 

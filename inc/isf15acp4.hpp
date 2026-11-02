@@ -80,7 +80,8 @@ public:
 
     /**
      * @brief Configure the active GRAM download window.
-     * @param rect Inclusive pixel rectangle in display coordinates.
+     * @param rect Inclusive pixel rectangle in display coordinates (0..width-1, 0..height-1). The driver adds the
+     *             variant's RAM column/row offset (DisplayGeometry::column_start / row_start).
      */
     bool SetWindow(const Rect& rect) noexcept;
 
@@ -134,13 +135,13 @@ public:
     /** @brief Fill the panel with a solid color. */
     bool FillScreen(Color565 color) noexcept;
 
-    /** @brief Draw a hardware-accelerated line (command 21H). */
+    /** @brief Draw a hardware-accelerated line (command 21H), in display coordinates. */
     bool DrawLine(const Point& start, const Point& end, Color565 color) noexcept;
 
-    /** @brief Draw a hardware rectangle outline (command 22H). */
+    /** @brief Draw a hardware rectangle outline (command 22H), in display coordinates. */
     bool DrawRectangle(const Rect& rect, Color565 color, bool filled = false) noexcept;
 
-    /** @brief Clear a rectangular window via controller command 25H. */
+    /** @brief Clear a rectangular window via controller command 25H, in display coordinates. */
     bool ClearWindow(const Rect& rect) noexcept;
 
     /**
@@ -185,6 +186,7 @@ private:
     void pulseReset() noexcept;
     bool runInitTable() noexcept;
     static void colorToSsd1331(Color565 color, uint8_t out[3]) noexcept;
+    [[nodiscard]] Rect toRam(const Rect& rect) const noexcept;
 };
 
 inline const char* GetDriverVersion() noexcept { return HF_ISF15ACP4_VERSION_STRING; }
