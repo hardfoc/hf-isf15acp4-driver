@@ -17,9 +17,10 @@ ctest --test-dir build-host --output-on-failure
 
 | File | Covers |
 | --- | --- |
-| [`tests/test_driver.cpp`](../tests/test_driver.cpp) | Init table and window, reset timing, VCC, port failures, range checks, pixel writes, hardware commands, frame upload, canvas, `ButtonUI`, `Animator` |
+| [`tests/test_driver.cpp`](../tests/test_driver.cpp) | Init table and window for each variant, reset timing, VCC, port failures, range checks, pixel byte and colour order, hardware commands, frame upload, hardware-direct binding, scrolling, canvas, `ButtonUI`, `Animator` |
 | [`tests/mock_spi.hpp`](../tests/mock_spi.hpp) | The recording port, with fault injection |
 | [`tests/test_harness.hpp`](../tests/test_harness.hpp) | A dependency-free test registry and `CHECK` macros |
+| [`tests/install_consumer/`](../tests/install_consumer/CMakeLists.txt) | CTest `hf_isf15acp4_install_package`: installs the package into the build tree and builds a `find_package()` consumer |
 
 The display returns no data, so the tests check what the driver sends, not what the panel shows. Colours and
 pixel order need a look at real hardware.

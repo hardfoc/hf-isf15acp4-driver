@@ -33,3 +33,15 @@ target_link_libraries(hf_isf15acp4_doc_snippets PRIVATE ${HF_ISF15ACP4_TARGET_NA
 target_include_directories(hf_isf15acp4_doc_snippets PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/docs)
 target_compile_features(hf_isf15acp4_doc_snippets PRIVATE cxx_std_20)
 target_compile_options(hf_isf15acp4_doc_snippets PRIVATE -Wall -Wextra)
+
+# The install rules: install the library into the build tree, then configure and build a find_package() consumer
+# against that prefix only (tests/install_consumer/).
+add_test(NAME hf_isf15acp4_install_package
+  COMMAND ${CMAKE_COMMAND}
+    -DBUILD_DIR=${PROJECT_BINARY_DIR}
+    -DPREFIX=${CMAKE_CURRENT_BINARY_DIR}/install_prefix
+    -DCONSUMER_SRC=${CMAKE_CURRENT_SOURCE_DIR}/install_consumer
+    -DCONSUMER_BIN=${CMAKE_CURRENT_BINARY_DIR}/install_consumer
+    -DCXX=${CMAKE_CXX_COMPILER}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/install_package_test.cmake
+)

@@ -6,6 +6,12 @@ cmake_minimum_required(VERSION 3.16)
 
 project(hf_isf15acp4_driver LANGUAGES CXX)
 
+include(GNUInstallDirs)
+# Installed layout mirrors the source tree, so the headers' "../src/*.ipp" includes resolve:
+#   <prefix>/include/hf_isf15acp4/inc/*.hpp, isf15acp4_version.h
+#   <prefix>/include/hf_isf15acp4/src/*.ipp
+set(HF_ISF15ACP4_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}/hf_isf15acp4")
+
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/hf_isf15acp4_build_settings.cmake)
 
 add_library(${HF_ISF15ACP4_TARGET_NAME} STATIC ${HF_ISF15ACP4_SOURCE_FILES})
@@ -13,13 +19,14 @@ target_include_directories(${HF_ISF15ACP4_TARGET_NAME}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/inc>
         $<BUILD_INTERFACE:${HF_ISF15ACP4_VERSION_HEADER_DIR}>
-        $<INSTALL_INTERFACE:include>
+        $<INSTALL_INTERFACE:${HF_ISF15ACP4_INSTALL_INCLUDEDIR}/inc>
 )
 target_compile_features(${HF_ISF15ACP4_TARGET_NAME} PUBLIC cxx_std_20)
 
 add_library(hf::isf15acp4 ALIAS ${HF_ISF15ACP4_TARGET_NAME})
 
 set_target_properties(${HF_ISF15ACP4_TARGET_NAME} PROPERTIES
+    EXPORT_NAME isf15acp4  # installed package target: hf::isf15acp4, the same name as the alias above
     VERSION ${HF_ISF15ACP4_VERSION}
     SOVERSION ${HF_ISF15ACP4_VERSION_MAJOR}
 )
@@ -38,19 +45,20 @@ if(HF_ISF15ACP4_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 install(TARGETS ${HF_ISF15ACP4_TARGET_NAME} EXPORT hf_isf15acp4Targets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    INCLUDES DESTINATION ${HF_ISF15ACP4_INSTALL_INCLUDEDIR}/inc
 )
 
-install(DIRECTORY inc/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" PATTERN "*.h.in" EXCLUDE)
-install(FILES "${HF_ISF15ACP4_VERSION_HEADER}" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY inc/ DESTINATION ${HF_ISF15ACP4_INSTALL_INCLUDEDIR}/inc
+    FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+install(DIRECTORY src/ DESTINATION ${HF_ISF15ACP4_INSTALL_INCLUDEDIR}/src
+    FILES_MATCHING PATTERN "*.ipp")
+install(FILES "${HF_ISF15ACP4_VERSION_HEADER}" DESTINATION ${HF_ISF15ACP4_INSTALL_INCLUDEDIR}/inc)
 
 install(EXPORT hf_isf15acp4Targets
     FILE hf_isf15acp4Targets.cmake

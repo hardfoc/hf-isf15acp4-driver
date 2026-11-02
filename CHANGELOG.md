@@ -48,6 +48,10 @@ code that used the affected API; together they call for a major version bump at 
 - `ConfigureScroll()` sent new `27h` parameters while scrolling could be running, and with `activate = false` sent
   `27h` before `2Eh`. It now always sends `2Eh` first, then `27h`, then `2Fh` only when activating (SSD1331 rev 1.2
   Table 10, `27h` note 2).
+- `cmake --install` produced an unusable package: the headers were installed without the `src/*.ipp` files they
+  include, and the exported target was `hf::hf_isf15acp4` instead of `hf::isf15acp4`. Headers now install to
+  `include/hf_isf15acp4/inc/`, the `.ipp` files to `include/hf_isf15acp4/src/`, and `find_package(hf_isf15acp4)`
+  provides `hf::isf15acp4`.
 
 ### Documentation
 
