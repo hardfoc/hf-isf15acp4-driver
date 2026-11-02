@@ -67,6 +67,11 @@ The SSD1331 takes each pixel as two bytes, high byte first (65k-colour format, S
 `Present()`, `DrawCanvas()`, `FillScreen()`, `DrawPixel()` and `WriteColors()` send that order on any CPU, so the
 canvas stays in native byte order and needs no swapping.
 
+The panel stores each pixel as blue, green, red (blue in bits 15 to 11, red in 4 to 0; NKK application notes,
+section 9). The same calls convert every `Color565` to that order with `ssd1331::ToPanelPixel()`, and the
+hardware line and rectangle commands send red as colour A and blue as colour C, so a colour looks the same however
+it is drawn. Only `WritePixels()` sends bytes unchanged: give it panel-order words.
+
 ## Text
 
 The font covers ASCII 32 (space) to 126 (`~`). Each character is 5 x 7 pixels with one column of spacing, so

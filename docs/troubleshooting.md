@@ -43,11 +43,15 @@ any CPU, so check your own code:
 - `WritePixels()` sends your bytes unchanged. For `Color565` buffers use `WriteColors()`
   ([API guide](api-guide.md#write-pixels-yourself)).
 
-## Red and blue swapped in hardware shapes
+## Red and blue swapped
 
-`DrawLine()` and `DrawRectangle()` send the colour as three components (C, B, A). Compare one against
-`DrawPixel()` in the same colour: if red and blue differ between them, draw that shape in the canvas instead
-(`GraphicsContext::DrawHLine()`, `FillRect()`) until the driver is fixed.
+The panel stores pixels as blue, green, red, and the driver converts every `Color565` it sends. If red shows as
+blue in one kind of drawing only, check:
+
+- Raw `WritePixels()` bytes: they go out unchanged, so convert each colour with `ssd1331::ToPanelPixel()` or use
+  `WriteColors()`.
+- A remap value (`A0h`) changed from the NKK initialisation table: bit 2 selects the colour order. Keep the
+  table's value.
 
 ## Image stretched or offset
 

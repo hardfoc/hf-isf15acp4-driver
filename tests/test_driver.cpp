@@ -163,6 +163,33 @@ TEST_CASE("DrawPixel sets a 1x1 window and sends the colour high byte first") {
   CHECK(spi.transactions[2].bytes == bytes({0xF8, 0x1F}));
 }
 
+TEST_CASE("Pixels go out in the panel's blue-green-red order, hardware shapes take red as colour A") {
+  // NKK Application Notes rev H section 9: pixel word B4..B0 G5..G0 R4..R0, high byte first. The init tables set
+  // A0h bit 2 = 0, so colour C (first 5 bits) is blue and colour A (last 5 bits) is red (SSD1331 rev 1.2 Table 9).
+  CHECK_EQ(isf15acp4::ssd1331::ToPanelPixel(isf15acp4::colors::Red), 0x001Fu);
+  CHECK_EQ(isf15acp4::ssd1331::ToPanelPixel(isf15acp4::colors::Blue), 0xF800u);
+  CHECK_EQ(isf15acp4::ssd1331::ToPanelPixel(isf15acp4::colors::Green), 0x07E0u);
+
+  isf15acp4_test::MockSpi spi;
+  Display display(&spi);
+  REQUIRE(display.Initialize());
+  spi.clear();
+  REQUIRE(display.DrawPixel(1, 1, isf15acp4::colors::Red));
+  CHECK(spi.transactions.back().bytes == bytes({0x00, 0x1F}));
+
+  auto gfx = display.CreateGraphicsContext();
+  gfx.Clear(isf15acp4::colors::Red);
+  spi.clear();
+  REQUIRE(display.Present(gfx));
+  CHECK(spi.transactions.back().bytes[0] == 0x00);
+  CHECK(spi.transactions.back().bytes[1] == 0x1F);
+
+  // 21h colours C, B, A on a 6-bit scale: red is A, the last byte.
+  spi.clear();
+  REQUIRE(display.DrawLine({0, 0}, {95, 63}, isf15acp4::colors::Red));
+  CHECK(spi.commands().back() == bytes({0x21, 0, 0, 95, 63, 0x00, 0x00, 0x3E}));
+}
+
 TEST_CASE("Hardware line and filled rectangle send their geometry and colour bytes") {
   isf15acp4_test::MockSpi spi;
   Display display(&spi);
@@ -207,10 +234,11 @@ TEST_CASE("Present sends every pixel high byte first, whatever the CPU byte orde
   REQUIRE(display.Present(gfx));
   const auto& frame = spi.transactions.back().bytes;
   REQUIRE(frame.size() == 12288);
-  CHECK(frame[0] == 0xFF);
-  CHECK(frame[1] == 0xE0);
-  CHECK(frame[12286] == 0xFF);
-  CHECK(frame[12287] == 0xE0);
+  // Yellow 0xFFE0 is 0x07FF in the panel's blue-green-red order (see the red/blue test below).
+  CHECK(frame[0] == 0x07);
+  CHECK(frame[1] == 0xFF);
+  CHECK(frame[12286] == 0x07);
+  CHECK(frame[12287] == 0xFF);
   CHECK_EQ(spi.open_transactions, 0);
 }
 
@@ -227,7 +255,7 @@ TEST_CASE("WriteColors needs Initialize() and a buffer, and uses one data transa
   REQUIRE(display.WriteColors(px, 3));
   REQUIRE(spi.transactions.size() == 1);
   CHECK(spi.transactions[0].data);
-  CHECK(spi.transactions[0].bytes == bytes({0xFF, 0xE0, 0x07, 0xFF, 0xFF, 0xFF}));
+  CHECK(spi.transactions[0].bytes == bytes({0x07, 0xFF, 0xFF, 0xE0, 0xFF, 0xFF}));
 }
 
 TEST_CASE("IsPressed reads the Switch pin through the port") {

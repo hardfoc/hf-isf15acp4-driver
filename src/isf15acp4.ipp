@@ -247,15 +247,16 @@ bool SmartDisplay<SpiType>::WriteColors(const Color565* colors, std::size_t coun
     }
 
     // SSD1331 rev 1.2 section 7.5.2, Table 9 (65k colour, 8-bit interface): first byte C4..C0 B5..B3, second byte
-    // B2..B0 A4..A0, i.e. the 16-bit pixel high byte first. Serialise explicitly so the CPU's byte order does not
-    // matter, in chunks inside one data transaction.
+    // B2..B0 A4..A0, i.e. the 16-bit pixel high byte first, with C = blue and A = red on the NKK panels
+    // (ToPanelPixel). Serialise explicitly so the CPU's byte order does not matter, in chunks inside one data
+    // transaction.
     constexpr std::size_t kChunkPixels = 64;
     uint8_t chunk[kChunkPixels * 2];
     std::size_t done = 0;
     while (done < count) {
         const std::size_t n = (count - done) < kChunkPixels ? (count - done) : kChunkPixels;
         for (std::size_t i = 0; i < n; ++i) {
-            const Color565 c = colors[done + i];
+            const uint16_t c = ssd1331::ToPanelPixel(colors[done + i]);
             chunk[2 * i] = static_cast<uint8_t>(c >> 8);
             chunk[2 * i + 1] = static_cast<uint8_t>(c & 0xFF);
         }
@@ -313,8 +314,7 @@ bool SmartDisplay<SpiType>::DrawPixel(uint8_t x, uint8_t y, Color565 color) noex
     if (!SetWindow({x, y, x, y})) {
         return false;
     }
-    const uint8_t bytes[2] = {static_cast<uint8_t>(color >> 8), static_cast<uint8_t>(color & 0xFF)};
-    return WritePixels(bytes, sizeof(bytes));
+    return WriteColors(&color, 1);
 }
 
 template <typename SpiType>
@@ -326,6 +326,7 @@ bool SmartDisplay<SpiType>::FillScreen(Color565 color) noexcept {
 
 template <typename SpiType>
 void SmartDisplay<SpiType>::colorToSsd1331(Color565 color, uint8_t out[3]) noexcept {
+    // NKK panels: colour A = red, B = green, C = blue (NKK Application Notes rev H section 9; init A0h bit 2 = 0).
     out[0] = static_cast<uint8_t>((color >> 11) & 0x1F);  // A: red 5-bit
     out[1] = static_cast<uint8_t>((color >> 5) & 0x3F);   // B: green 6-bit
     out[2] = static_cast<uint8_t>(color & 0x1F);          // C: blue 5-bit

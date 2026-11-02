@@ -90,8 +90,8 @@ public:
     /**
      * @brief Stream raw pixel bytes to the controller GRAM, unchanged.
      *
-     * The bytes must already be in the controller's 65k-colour format: two bytes per pixel, high byte first.
-     * For Color565 buffers use WriteColors().
+     * The bytes must already be in the panel's 65k-colour format: two bytes per pixel, high byte first, blue in
+     * bits 15..11 and red in bits 4..0 (see ssd1331::ToPanelPixel()). For Color565 buffers use WriteColors().
      *
      * @param data Pixel buffer (two bytes per pixel).
      * @param byte_len Number of bytes (must be even).
@@ -101,8 +101,9 @@ public:
     /**
      * @brief Stream Color565 pixels to the controller GRAM in the SSD1331 65k-colour byte order.
      *
-     * Each pixel goes out high byte first (SSD1331 rev 1.2 section 7.5.2, Table 9), whatever the CPU's byte order,
-     * in one data transaction. Use this instead of WritePixels() for Color565 buffers.
+     * Each pixel is converted to the panel's colour order (ssd1331::ToPanelPixel(): blue in the high bits) and goes
+     * out high byte first (SSD1331 rev 1.2 section 7.5.2, Table 9), whatever the CPU's byte order, in one data
+     * transaction. Use this instead of WritePixels() for Color565 buffers.
      *
      * @param colors Pixel buffer.
      * @param count Number of pixels (not bytes).

@@ -15,11 +15,16 @@ code that used the affected API; together they call for a major version bump at 
 - **BREAKING** `Present()`, `DrawCanvas()` and `FillScreen()` now send each pixel high byte first on every CPU
   (SSD1331 rev 1.2 section 7.5.2, Table 9). Remove any byte swap added around `Present()` as a workaround, or it
   swaps the frame back.
+- **BREAKING** Pixel data (`Present()`, `DrawCanvas()`, `FillScreen()`, `DrawPixel()`, `WriteColors()`) is now
+  converted from RGB565 to the panel's blue-green-red word, so red and blue are no longer swapped against the
+  hardware line and rectangle commands (NKK Application Notes rev H section 9). Code that pre-swapped red and blue
+  to compensate must stop. `WritePixels()` still sends raw bytes: convert them with `ssd1331::ToPanelPixel()`.
 
 ### Added
 
 - `SmartDisplay::WriteColors(colors, count)` streams `Color565` pixels in the controller's byte order.
   `WritePixels()` still sends raw bytes unchanged.
+- `ssd1331::ToPanelPixel(color)` converts a `Color565` to the panel's pixel word.
 
 ### Fixed
 
@@ -28,6 +33,9 @@ code that used the affected API; together they call for a major version bump at 
 - Frames went out in memory order, low byte first on little-endian MCUs (ESP32, Arm Cortex-M, x86), so colours
   were wrong after `Present()`. The canvas upload and the hardware-direct flush hook now serialise each pixel high
   byte first.
+- Pixels drawn through the frame or `DrawPixel()` showed red as blue and blue as red: the NKK init tables select
+  the normal colour order (A0h bit 2 = 0), in which the pixel word's high 5 bits are colour C, blue on these
+  panels. `DrawLine()` and `DrawRectangle()` already sent red as colour A and were correct.
 
 ### Documentation
 
