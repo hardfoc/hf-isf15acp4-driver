@@ -25,3 +25,4 @@ _site/
 # OS
 .DS_Store
 Thumbs.db
+site/

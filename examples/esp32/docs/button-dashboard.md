@@ -21,5 +21,5 @@ Motor-control style dashboard demonstrating production UI patterns:
 
 ## Related Docs
 
-- [../../../docs/graphics_engines.md](../../../docs/graphics_engines.md)
+- [../../../docs/graphics.md](../../../docs/graphics.md)
 - [../../../docs/animations.md](../../../docs/animations.md)

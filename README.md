@@ -1,116 +1,102 @@
----
-layout: default
-title: "HardFOC ISF15ACP4 Driver"
-description: "MCU-agnostic C++ driver for the NKK ISF15ACP4 96×64 SmartDisplay OLED pushbutton"
-nav_order: 1
-permalink: /
----
+# ISF15ACP4 Driver
 
-# HF-ISF15ACP4 Driver
+A C++20 driver for the NKK ISF15ACP4 SmartDisplay, a pushbutton with a 96 x 64 colour OLED: initialise it, draw
+text, shapes, images and animations, and read the switch, from any MCU with SPI.
 
-**The complete MCU-agnostic driver for the [NKK ISF15ACP4](https://www.nkkswitches.com/wp-content/themes/impress-blank/search/inc/part.php?part_no=ISF15ACP4) — a 96×64 RGB OLED pushbutton with integrated momentary switch.**
+[![Host tests](https://github.com/hardfoc/hf-isf15acp4-driver/actions/workflows/ci-host-tests.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-isf15acp4-driver/actions/workflows/ci-host-tests.yml)
+[![ESP32 examples](https://github.com/hardfoc/hf-isf15acp4-driver/actions/workflows/esp32-examples-build-ci.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-isf15acp4-driver/actions/workflows/esp32-examples-build-ci.yml)
+[![Docs](https://github.com/hardfoc/hf-isf15acp4-driver/actions/workflows/ci-docs-publish.yml/badge.svg?branch=main)](https://hardfoc.github.io/hf-isf15acp4-driver/)
+[![License: GPL-3.0](https://img.shields.io/github/license/hardfoc/hf-isf15acp4-driver)](LICENSE)
 
-![ISF15ACP4 frameless OLED pushbutton](docs/assets/isf15acp4-product-hero.png)
+**Documentation: <https://hardfoc.github.io/hf-isf15acp4-driver/>**
 
-## Why This Driver?
+<!-- figure: driver-layers -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/driver-layers.dark.svg">
+  <img src="docs/diagrams/driver-layers.svg"
+    alt="Layer diagram: the application draws into a graphics context and calls the hardware-agnostic
+    SmartDisplay driver, which uses the CRTP SPI interface, which calls the platform port you write,
+    which drives the SPI bus, the D/C, SS, RES and VCC enable lines and reads the switch of the
+    ISF15ACP4.">
+</picture>
+<!-- /figure -->
 
-The ISF15ACP4 packs a vivid 65k-color OLED and a tactile button into a 23 mm footprint — ideal for machine panels, test fixtures, and compact HMI controls. This driver gives you:
+## In 30 seconds
 
-- **Full SSD1331 protocol** — init, GRAM upload, hardware draw, scroll, dim, switch read
-- **Swappable graphics engines** — `BuiltinCanvas`, `HardwareDirect`, `Animator` (select at construction)
-- **ButtonUI helper** — debounced press/click/long-press with gauge and status rendering
-- **Procedural animations** — color wheel, plasma, scrolling text, pulse effects
-- **4 ESP32 examples** — test suite, UI demo, animation showcase, motor dashboard
-- **Rich documentation** — pinout, wiring, and UI visual guides
+Write a small port class for your MCU (SPI write with D/C and SS, four control pins, the switch, a delay;
+[Porting](https://hardfoc.github.io/hf-isf15acp4-driver/latest/porting/)), then:
 
-## Quick Example
-
+<!-- generated: quickstart-code -->
 ```cpp
-isf15acp4::SmartDisplayConfig config{
-    .variant = isf15acp4::ProductVariant::Isf15acp4,
-    .graphics = isf15acp4::GraphicsBackend::Animator,
-};
+#include "isf15acp4.hpp"
 
-isf15acp4::SmartDisplay display(&adapter, config);
-display.Initialize(true);
+int show_ready(MySpi& spi) {
+  isf15acp4::SmartDisplay<MySpi> display(&spi);       // ISF15ACP4, software canvas
 
-auto gfx = display.CreateGraphicsContext();
-isf15acp4::Animator anim(gfx, isf15acp4::animations::ColorWheel, nullptr, 25);
+  if (!display.Initialize()) {                        // 1. reset, 15 V on, SSD1331 init table
+    return -1;                                        // wiring, VCC or SPI: see GetLastError()
+  }
 
-while (true) {
-    if (anim.Tick(33)) display.Present(gfx);
-    if (display.IsPressed()) { /* your action */ }
+  auto gfx = display.CreateGraphicsContext();         // 2. draw into a 96 x 64 RGB565 frame
+  gfx.Clear(isf15acp4::colors::Black);
+  gfx.DrawString(4, 4, "READY", isf15acp4::colors::Green);
+  gfx.DrawRect({0, 0, 95, 63}, isf15acp4::colors::White);
+
+  if (!display.Present(gfx)) {                        // 3. send the frame (12,288 bytes)
+    return -2;
+  }
+  return display.IsPressed() ? 1 : 0;                 // 4. the switch, through your port
 }
 ```
+<!-- /generated -->
 
-## Graphics Backends
+## What it does
 
-| Engine | Select With | Best For |
-|--------|-------------|----------|
-| **BuiltinCanvas** | `GraphicsBackend::BuiltinCanvas` | Screens, icons, imported images |
-| **HardwareDirect** | `GraphicsBackend::HardwareDirect` | Low-RAM overlays, HW lines/rects |
-| **Animator** | `GraphicsBackend::Animator` | Smooth procedural motion |
+- Resets the display, sequences its 15 V drive supply and sends the SSD1331 initialisation table
+  (`Initialize()`).
+- Draws into a 96 x 64 RGB565 canvas with lines, rectangles, a 5 x 7 font and images, and uploads it in one
+  transaction (`Present()`).
+- Runs the controller's own line, rectangle, clear and scroll commands, and sets brightness and dim mode.
+- Times animations (`Animator`, four built-in effects) and debounces the switch into press, click and long-press
+  events (`ButtonUI`).
+- No heap, no exceptions, no RTOS, no virtual calls (the port is a CRTP class).
 
-See [Graphics Engines](docs/graphics_engines.md).
+## Install
 
-## Example Gallery
+```bash
+git submodule add https://github.com/hardfoc/hf-isf15acp4-driver.git external/hf-isf15acp4-driver
+```
 
-| Preview | App |
-|---------|-----|
-| ![Dashboard mockup](docs/assets/isf15acp4-ui-dashboard-mockup.png) | `isf15acp4_button_dashboard` |
-| ![Animation frame](docs/assets/isf15acp4-anim-frame-01.png) | `isf15acp4_animation_demo` |
-| ![Button states](docs/assets/isf15acp4-button-states.png) | `isf15acp4_ui_demo` |
+```cmake
+add_subdirectory(external/hf-isf15acp4-driver)
+target_link_libraries(my_app PRIVATE hf_isf15acp4)
+```
+
+ESP-IDF: use the component wrapper in [`examples/esp32/components/hf_isf15acp4`](examples/esp32/components/hf_isf15acp4/CMakeLists.txt).
+Details: [Installation](https://hardfoc.github.io/hf-isf15acp4-driver/latest/installation/).
 
 ## Documentation
 
-| Guide | Link |
-|-------|------|
-| Architecture | [docs/architecture.md](docs/architecture.md) |
-| Configuration | [docs/configuration.md](docs/configuration.md) |
-| CMake Integration | [docs/cmake_integration.md](docs/cmake_integration.md) |
-| Hardware Setup | [docs/hardware_setup.md](docs/hardware_setup.md) |
-| Graphics Engines | [docs/graphics_engines.md](docs/graphics_engines.md) |
-| Animations | [docs/animations.md](docs/animations.md) |
-| Examples | [docs/examples.md](docs/examples.md) |
-| Troubleshooting | [docs/troubleshooting.md](docs/troubleshooting.md) |
-| API Reference | [docs/api_reference.md](docs/api_reference.md) |
-| ESP32 Examples | [examples/esp32/README.md](examples/esp32/README.md) |
+| | |
+| --- | --- |
+| [Quickstart](https://hardfoc.github.io/hf-isf15acp4-driver/latest/quickstart/) | Wire it, write the port, show text |
+| [Hardware](https://hardfoc.github.io/hf-isf15acp4-driver/latest/hardware/) | Pins, supplies, SPI timing, power sequence |
+| [API guide](https://hardfoc.github.io/hf-isf15acp4-driver/latest/api-guide/) | Initialise, draw, brightness, switch, errors |
+| [Graphics](https://hardfoc.github.io/hf-isf15acp4-driver/latest/graphics/) | Backends, colours, text, images |
+| [Examples](https://hardfoc.github.io/hf-isf15acp4-driver/latest/examples/) | ESP32 applications |
+| [API reference](https://hardfoc.github.io/hf-isf15acp4-driver/latest/api/) | Doxygen, every class and member |
 
-## CI / Quality
+The pages are in [`docs/`](docs/index.md).
 
-| Workflow | Purpose |
-|----------|---------|
-| `esp32-examples-build-ci.yml` | ESP32 example matrix builds |
-| `ci-cpp-lint.yml` | clang-format + clang-tidy |
-| `ci-cpp-analysis.yml` | Cppcheck static analysis |
-| `ci-markdown-lint.yml` | Markdown lint |
-| `ci-yaml-lint.yml` | YAML lint |
-| `ci-docs-linkcheck.yml` | Link validation |
-| `ci-docs-publish.yml` | Jekyll + Doxygen to GitHub Pages |
-| `release.yml` | Tagged release artifacts |
-
-## hf-core integration
-
-Submodule: `hf-core-drivers/external/hf-isf15acp4-driver`. Enable with `HF_CORE_ENABLE_ISF15ACP4 ON` (platform default **OFF**). See [docs/configuration.md](docs/configuration.md).
-
-## ESP32 Build
+## Tests
 
 ```bash
-cd examples/esp32
-./scripts/build_app.sh isf15acp4_animation_demo Debug
-./scripts/flash_app.sh isf15acp4_animation_demo Debug
+cmake -S . -B build-host -DHF_ISF15ACP4_BUILD_TESTS=ON && cmake --build build-host && ctest --test-dir build-host
 ```
 
-## Features
-
-- CRTP `SpiInterface` — zero virtual overhead, any MCU
-- NKK Table 3 init for ISF15ACP4 (50k-hour frameless)
-- RGB565 canvas + 5×7 font + PNG→C array converter
-- `ButtonUI` — click, long-press, gauge, status panels
-- `Animator` — timed frame callbacks at configurable FPS
-- Doxygen-documented API
-- CI matrix across ESP-IDF 5.4/5.5
+The host tests check the exact bytes and pin sequence the driver sends; the code on the documentation site is
+compiled by the same build.
 
 ## License
 
-GNU General Public License v3.0 — see [LICENSE](LICENSE).
+GPL-3.0. See [LICENSE](LICENSE).

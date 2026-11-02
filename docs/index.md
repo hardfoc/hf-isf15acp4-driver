@@ -1,57 +1,108 @@
 ---
-layout: default
-title: Documentation
-nav_order: 2
-has_children: true
+hide:
+  - navigation
+  - toc
 ---
 
-# Documentation Index
+<div class="hf-hero" markdown>
+<span class="hf-kicker">HardFOC driver</span>
 
-Welcome to the HF-ISF15ACP4 driver documentation.
+# ISF15ACP4 Driver
 
-![ISF15ACP4 SmartDisplay](assets/isf15acp4-product-hero.png)
+<p>A C++20 driver for the NKK ISF15ACP4 SmartDisplay, a pushbutton with a 96 x 64 colour OLED in its keytop. It
+initialises the display's SSD1331 controller, draws text, shapes, images and animations, and reads the switch, on
+any MCU with SPI.</p>
 
-## Getting Started
+[Quickstart](quickstart.md){ .md-button .md-button--primary }
+[API guide](api-guide.md){ .md-button }
+[Source on GitHub](https://github.com/hardfoc/hf-isf15acp4-driver){ .md-button }
+</div>
 
-| Guide | Description |
-|-------|-------------|
-| [Quick Start](quickstart.md) | Minimal integration in 5 minutes |
-| [Getting Started](getting_started.md) | Full walkthrough with visuals |
-| [Installation](installation.md) | CMake, ESP-IDF, header-only copy |
-| [Configuration](configuration.md) | CMake flags, Kconfig, hf-core opt-in |
-| [CMake Integration](cmake_integration.md) | Standalone, ESP-IDF, hf-core |
-| [Platform Integration](platform_integration.md) | Implement `SpiInterface` for your MCU |
+The driver has no platform code. You give it a small class that writes SPI bytes with the D/C and SS lines, sets
+the reset and supply-enable pins and reads the switch; it does the rest: the reset pulse, the controller's
+initialisation table, memory windows, colour conversion and the hardware drawing commands.
 
-## Core Concepts
+<div class="hf-chip" markdown>
+<div class="hf-chip__head">
+<span class="hf-chip__kicker">Frameless OLED pushbutton</span>
+<span class="hf-chip__name">ISF15ACP4</span>
+<span class="hf-chip__vendor">NKK Switches (SmartDisplay)</span>
+</div>
 
-| Guide | Description |
-|-------|-------------|
-| [Architecture](architecture.md) | Layered design with visual overview |
-| [Hardware Setup](hardware_setup.md) | Pinout, power, wiring, variants |
-| [Hardware Notes](hardware.md) | Supplemental electrical notes |
-| [Graphics Engines](graphics_engines.md) | Swappable BuiltinCanvas / HardwareDirect / Animator |
-| [Graphics Guide](graphics.md) | Colors, text, images, performance |
-| [Animations](animations.md) | Procedural effects, example apps, frame import |
+Display
+:   96 x 64 RGB passive-matrix OLED, 65,536 colours (RGB565), driver with 96 x 64 x 16-bit display RAM
 
-## Reference
+Host interface
+:   SPI, write only: SS, D/C, SCK, SDI; clock cycle 150 ns minimum (about 6.6 MHz)
 
-| Guide | Description |
-|-------|-------------|
-| [API Reference](api_reference.md) | Method tables + Doxygen link |
-| [Datasheet](datasheet/index.md) | Manufacturer links and PDF index |
-| [Examples](examples.md) | ESP32 apps and CI matrix |
-| [Troubleshooting](troubleshooting.md) | Common bring-up issues |
+Supplies
+:   VDD 2.4 V to 3.5 V (logic), VCC 14 V to 16 V (OLED drive, 11 mA typical with all pixels on)
 
-## Example Apps
+Switch
+:   SPST normally open, 100 mA at 12 V DC, 2.0 N, 1.8 mm travel, 1,000,000 operations
 
-| App | Description |
-|-----|-------------|
-| [ESP32 Examples](../examples/esp32/README.md) | Build, flash, monitor |
-| `isf15acp4_comprehensive_test` | Full API test suite |
-| `isf15acp4_animation_demo` | Color wheel, plasma, scroll, pulse |
-| `isf15acp4_button_dashboard` | Gauge + debounced motor UI |
-| `isf15acp4_ui_demo` | Press counter + live bar |
+Operating range
+:   −20 °C to +70 °C; display life 50,000 h at 100 cd/m² with 40 % of pixels on
 
-## Assets
+Driver mode
+:   65k-colour mode; full frames from a CPU canvas, or the controller's line and rectangle commands
 
-Documentation images live in [`docs/assets/`](assets/). Convert custom PNGs with `scripts/convert_image_to_rgb565.py`.
+[Datasheet (NKK)](https://www.nkkswitches.com/pdf/IS15ACP4_FramelessOLED.pdf)
+</div>
+
+## What you get
+
+- **One object per button.** `SmartDisplay<YourPort>` owns the reset, the supply sequence and the SSD1331
+  initialisation. See [API guide](api-guide.md).
+- **A canvas with text.** `GraphicsContext` draws pixels, lines, rectangles, a 5 x 7 font and RGB565 images into a
+  12,288-byte frame that `Present()` uploads. See [Graphics](graphics.md).
+- **Hardware drawing.** Lines, filled rectangles, window clear and scrolling run on the controller with a few
+  command bytes each. See [API guide](api-guide.md#draw-with-the-controller).
+- **Animations and a button helper.** `Animator` runs a frame callback at a fixed rate; `ButtonUI` debounces the
+  switch into press, click and long-press events. See [Animations](animations.md).
+- **Zero-overhead portability.** The port is a CRTP class: no virtual calls, no heap, no RTOS dependency.
+  See [Porting](porting.md).
+- **Tested without hardware.** Host unit tests check the exact byte stream and pin sequence against a recording
+  port. See [Testing and CI](testing.md).
+
+## Where to go next
+
+<div class="grid cards" markdown>
+
+-   :material-rocket-launch-outline: **[Quickstart](quickstart.md)**
+
+    ---
+
+    Wire the button, write the port, show text in about 15 lines.
+
+-   :material-chip: **[Hardware](hardware.md)**
+
+    ---
+
+    Pins, the two supplies, SPI timing and the power sequence.
+
+-   :material-layers-outline: **[Architecture](architecture.md)**
+
+    ---
+
+    The three layers and what each one owns.
+
+-   :material-code-braces: **[API guide](api-guide.md)**
+
+    ---
+
+    Initialise, draw, set brightness, read the switch and handle errors.
+
+-   :material-swap-horizontal: **[Porting](porting.md)**
+
+    ---
+
+    Implement the SPI interface for your MCU.
+
+-   :material-book-open-variant: **[API reference](api-reference.md)**
+
+    ---
+
+    Every class and member, generated from the headers.
+
+</div>

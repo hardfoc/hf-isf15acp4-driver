@@ -1,95 +1,97 @@
----
-layout: default
-title: Architecture
-parent: Documentation
-nav_order: 20
----
 # Architecture
 
-The HF-ISF15ACP4 driver is organized as a layered, MCU-agnostic stack. Each layer has a single responsibility and can be replaced without rewriting application logic.
+How the driver is put together: three layers, what each owns, and how one call reaches the display.
 
-![ISF15ACP4 product — frameless 96×64 OLED pushbutton](assets/isf15acp4-product-hero.png)
+<!-- figure: driver-layers -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/driver-layers.dark.svg">
+  <img src="diagrams/driver-layers.svg"
+    alt="Layer diagram: the application draws into a graphics context and calls the hardware-agnostic
+    SmartDisplay driver, which uses the CRTP SPI interface, which calls the platform port you write,
+    which drives the SPI bus, the D/C, SS, RES and VCC enable lines and reads the switch of the
+    ISF15ACP4.">
+</picture>
+<!-- /figure -->
 
-## Layer Overview
+## The three layers
 
-![Driver architecture layers](assets/isf15acp4-architecture-layers.png)
+| Layer | What | You change it |
+| --- | --- | --- |
+| Hardware-agnostic core | `SmartDisplay<SpiType>` and the graphics, animation and button helpers | Never |
+| Communication interface | `SpiInterface<Derived>` | Never |
+| Platform port | Your class | Once per MCU or board ([Porting](porting.md)) |
 
-| Layer | Responsibility | Key Types |
-|-------|----------------|-----------|
-| **Application** | Your UI, animations, control logic | FreeRTOS tasks, callbacks |
-| **Graphics Engine** | Swappable render backend | `GraphicsContext`, `GraphicsBackend`, `Animator`, `ButtonUI` |
-| **SmartDisplay Driver** | SSD1331 protocol, power, switch | `SmartDisplay<SpiType>` |
-| **Transport** | SPI + GPIO CRTP contract | `SpiInterface<Derived>` |
-| **Platform HAL** | MCU peripherals | ESP32 SPI master, GPIO, charge pump |
+Everything above the port is the same on ESP32, STM32, a Linux host or the unit-test port. That is how the
+[host tests](testing.md) run the real driver code without hardware.
 
-## Graphics Backend Selection
+## How one call reaches the display
 
-Choose the graphics engine when constructing the display:
-
-```cpp
-isf15acp4::SmartDisplayConfig config{
-    .variant = isf15acp4::ProductVariant::Isf15acp4,
-    .graphics = isf15acp4::GraphicsBackend::Animator,  // or BuiltinCanvas, HardwareDirect
-    .enable_vcc_on_init = true,
-};
-
-isf15acp4::SmartDisplay display(&adapter, config);
-isf15acp4::GraphicsContext gfx = display.CreateGraphicsContext();
-display.ConfigurePresenter(gfx);  // required for HardwareDirect
+```mermaid
+sequenceDiagram
+    participant A as Application
+    participant G as GraphicsContext
+    participant D as SmartDisplay
+    participant P as Your port
+    A->>G: DrawString(4, 4, "READY", Green)
+    G->>G: 5 x 7 glyphs into the RGB565 canvas
+    A->>D: Present(gfx)
+    D->>P: BeginCommand(), WriteBytes(15h 00h 5Fh), EndTransaction()
+    D->>P: BeginCommand(), WriteBytes(75h 00h 3Fh), EndTransaction()
+    D->>P: BeginData(), WriteBytes(frame, 12288), EndTransaction()
+    P-->>D: true / false
+    D-->>A: true / false
 ```
 
-### Available Backends
+## The pieces of the core
 
-| Backend | Best For | Framebuffer | Notes |
-|---------|----------|-------------|-------|
-| `BuiltinCanvas` | Static screens, text, icons | Yes (CPU) | Default — full 5×7 font + blit |
-| `HardwareDirect` | Sparse overlays, lines, boxes | No | Uses SSD1331 draw commands live |
-| `Animator` | Smooth procedural effects | Yes (CPU) | Canvas + `Animator` frame sequencer |
+| Type | Owns |
+| --- | --- |
+| `SmartDisplay` | Reset and supply sequence, init table, windows, frame upload, hardware drawing, scroll, brightness, switch, errors |
+| `GraphicsContext` | The drawing surface, with the backend chosen at construction |
+| `Canvas` | A 96 x 64 RGB565 frame, software drawing, the 5 x 7 font |
+| `Animator` | Frame timing; `animations::` holds four built-in effects |
+| `ButtonUI` | Switch debouncing and events, status and gauge drawing |
+| `ssd1331::` | Command opcodes, init tables, timing constants |
+| Types | `SmartDisplayConfig`, `ProductVariant`, `Error`, `Rect`, `Point`, `Color565`, `colors::` |
 
-All backends share the same `GraphicsContext` drawing API. Call `display.Present(gfx)` to flush to the panel.
+## Why CRTP
 
-## SPI Transport Contract
+The interface is a class template parameter, not a virtual base class. The compiler sees your port's methods
+directly and inlines them; the driver has no vtable, allocates nothing and needs no RTTI. The cost is that the
+driver type names the port: `SmartDisplay<MySpi>`. Code that works with several port types takes the driver as a
+template parameter too.
 
-The ISF15ACP4 uses **SPI mode 0** with **software SS** and **D/C**:
+`GraphicsContext` uses the same pattern (`GraphicsSurface<Derived>`) for its drawing calls. Its link back to the
+display in hardware-direct mode is a small table of function pointers (`DisplayPresenter`), so the graphics code
+does not depend on your port type.
 
-1. **Command path** — `BeginCommand()` → opcode + parameters → `EndTransaction()`
-2. **Data path** — `BeginData()` → RGB565 pixel stream → `EndTransaction()`
+## Memory
 
-NKK requires each command and its parameter bytes to complete in one SS-low session. Always wait for SPI completion before releasing CS.
+Nothing is allocated on the heap. The large objects are the frames:
 
-![Pinout reference](assets/isf15acp4-pinout-diagram.png)
+| Object | Size |
+| --- | --- |
+| `Canvas` | 12,288 bytes (96 x 64 x 2), whatever the variant |
+| `GraphicsContext` | One `Canvas` plus a few bytes, in every backend |
+| `SmartDisplay` | A few dozen bytes; `FillScreen()` builds a temporary `Canvas` on the stack |
 
-## Power-Up Sequence
+Keep a `GraphicsContext` as a static or long-lived object rather than on a small task stack, and give the task that
+calls `FillScreen()` at least 13 KB of stack.
 
-Per [NKK OLED application notes](https://docs.nkkswitches.com/docs/application-notes/oled-application-notes/):
+## Source map
 
-1. **VCC disabled** at power-up (charge pump shutdown)
-2. **RES** held low ≥ 3 µs, then released
-3. **VCC enabled** before display turn-on
-4. **VCC must never be below VDD** (internal ESD clamp)
+Headers are in [`inc/`](../inc/isf15acp4.hpp) and their template bodies (`.ipp`) in [`src/`](../src/isf15acp4.ipp);
+every file name starts with `isf15acp4`.
 
-The driver handles steps 2–4 when `Initialize(true)` is called with `VccEnable` wired.
+| File | Contents |
+| --- | --- |
+| `.hpp`, `.ipp` | `SmartDisplay<SpiType>` |
+| `_spi_interface.hpp` | `SpiInterface`, `CtrlPin`, `GpioSignal` |
+| `_graphics_*.hpp`, `_canvas.hpp` | Graphics backends, the canvas |
+| `_animator.hpp`, `_button_ui.hpp` | Animation and switch helpers, `SmartDisplayConfig` |
+| `_font.hpp`, `_font_data.cpp` | The 5 x 7 font: the one compiled source |
+| `_ssd1331.hpp` | SSD1331 commands, init tables |
+| `_types.hpp` | Types, colours, geometry |
 
-## Product Variants
-
-| Part | Resolution | Init Table | Typical Use |
-|------|------------|------------|-------------|
-| **ISF15ACP4** | 96×64 | Table 3 | Frameless pushbutton (50k hr) |
-| ISC15ANP4 | 64×48 | Table 1 | Standard pushbutton |
-| ISC01P | 52×36 | Table 2 | Display-only module |
-
-## Frame Pipeline
-
-For full-screen updates (most UI and animation):
-
-1. Draw into `GraphicsContext` / `Canvas` (12,288 bytes RGB565 for ISF15ACP4)
-2. `SmartDisplay::Present(gfx)` sets the GRAM window and streams pixels
-3. SSD1331 immediately refreshes the OLED from GRAM
-
-Theoretical max frame rate at 6.6 MHz SPI: **~67 FPS** for ISF15ACP4 (real-world: 30–45 FPS depending on CPU).
-
-## Wiring Reference
-
-![ESP32 wiring diagram](assets/isf15acp4-wiring-esp32.png)
-
-See [Hardware Notes](hardware.md) for charge pump requirements and layout recommendations.
+`scripts/convert_image_to_rgb565.py` converts PNG artwork, `tests/` holds the host tests and the compiled
+documentation snippets, and `examples/esp32/` the ESP-IDF applications.
