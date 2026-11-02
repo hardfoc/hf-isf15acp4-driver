@@ -7,9 +7,12 @@ on:
   pull_request:
     branches: [main, develop]
 
+permissions:
+  contents: read
+
 jobs:
   cppcheck:
-    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-cpp-analysis.yml@main
+    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-cpp-analysis.yml@v1
     with:
       paths: "inc src examples/esp32/main"
       std: "c++20"
