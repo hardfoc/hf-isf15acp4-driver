@@ -12,6 +12,7 @@
 add_executable(hf_isf15acp4_host_tests
   test_main.cpp
   test_driver.cpp
+  test_gpio_errors.cpp
 )
 
 target_link_libraries(hf_isf15acp4_host_tests PRIVATE ${HF_ISF15ACP4_TARGET_NAME})

@@ -57,8 +57,16 @@ public:
     return true;
   }
 
-  void GpioSet(isf15acp4::CtrlPin pin, isf15acp4::GpioSignal signal) noexcept {
+  /// Fault injection: GpioSet() on this pin fails (and does not change it). Switch = none.
+  isf15acp4::CtrlPin failing_pin = isf15acp4::CtrlPin::Switch;
+  bool gpio_fails = false;
+
+  bool GpioSet(isf15acp4::CtrlPin pin, isf15acp4::GpioSignal signal) noexcept {
+    if (gpio_fails && pin == failing_pin) {
+      return false;
+    }
     pins.push_back({pin, signal, now_us});
+    return true;
   }
 
   bool GpioRead(isf15acp4::CtrlPin pin) noexcept {
