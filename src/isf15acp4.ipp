@@ -49,13 +49,30 @@ void SmartDisplay<SpiType>::setError(Error e) noexcept {
 }
 
 template <typename SpiType>
-void SmartDisplay<SpiType>::pulseReset() noexcept {
+bool SmartDisplay<SpiType>::setPin(CtrlPin pin, GpioSignal signal, bool power_sequence) noexcept {
+    if (bus_->GpioSet(pin, signal)) {
+        return true;
+    }
+    setError(Error::GpioControl);
+    if (power_sequence) {
+        setError(Error::PowerSequence);  // RES# or VCC: the panel's power-up sequence is broken
+    }
+    return false;
+}
+
+template <typename SpiType>
+bool SmartDisplay<SpiType>::pulseReset() noexcept {
     // SSD1331 rev 1.2, section 7.9 and Table 18: hold RES# low (Reset asserted = Active) for at least 3 us, release
     // it high (Inactive), then allow the reset completion time (2 us max) before the first command.
-    bus_->GpioSetActive(CtrlPin::Reset);
+    if (!setPin(CtrlPin::Reset, GpioSignal::Active, true)) {
+        return false;
+    }
     bus_->DelayUs(ssd1331::kResetPulseMinUs);
-    bus_->GpioSetInactive(CtrlPin::Reset);
+    if (!setPin(CtrlPin::Reset, GpioSignal::Inactive, true)) {
+        return false;
+    }
     bus_->DelayUs(ssd1331::kResetRecoveryUs);
+    return true;
 }
 
 template <typename SpiType>
@@ -118,14 +135,22 @@ bool SmartDisplay<SpiType>::Initialize(bool enable_vcc) noexcept {
         return false;
     }
 
-    bus_->GpioSetInactive(CtrlPin::ChipSelect);
-    bus_->GpioSetActive(CtrlPin::DataCommand);
-    bus_->GpioSetInactive(CtrlPin::VccEnable);
+    // A pin the port could not drive stops the sequence: no command goes to a panel whose SS, D/C,
+    // RES# or VCC state is unknown.
+    if (!setPin(CtrlPin::ChipSelect, GpioSignal::Inactive, false) ||
+        !setPin(CtrlPin::DataCommand, GpioSignal::Active, false) ||
+        !setPin(CtrlPin::VccEnable, GpioSignal::Inactive, true)) {
+        return false;
+    }
 
-    pulseReset();
+    if (!pulseReset()) {
+        return false;
+    }
 
     if (enable_vcc) {
-        bus_->GpioSetActive(CtrlPin::VccEnable);
+        if (!setPin(CtrlPin::VccEnable, GpioSignal::Active, true)) {
+            return false;
+        }
         bus_->DelayUs(1000);
     }
 
