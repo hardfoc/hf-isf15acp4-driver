@@ -105,6 +105,47 @@
   <meta property="og:description" content="Hardware-agnostic C++20 driver for the NKK ISF15ACP4 96x64 RGB OLED SmartDisplay pushbutton (SPI). Part of the HardFOC ecosystem.">
   <meta property="og:url" content="https://hardfoc.github.io/hf-isf15acp4-driver/latest/diagrams/">
   <meta name="twitter:card" content="summary">
+  <script>
+(function () {
+  if (typeof mermaid != "undefined" && !(mermaid instanceof Element)) return;
+  var SRC = "https://unpkg.com/mermaid@11/dist/mermaid.min.js", config = {}, real, loading, waiting = [];
+  var stub = {
+    initialize: function (c) { config = c || {}; if (real) real.initialize(config); },
+    render: function (id, text) {
+      var el = null, pres = document.querySelectorAll("pre.mermaid:not([data-hf-mermaid])");
+      for (var i = 0; i < pres.length && !el; i++) if (pres[i].textContent === text) el = pres[i];
+      if (el) el.setAttribute("data-hf-mermaid", "");
+      return near(el).then(load).then(function (m) { return m.render(id, text); });
+    }
+  };
+  function load() {
+    return loading || (loading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = SRC;
+      s.onload = function () {
+        real = window.mermaid;
+        window.mermaid = stub;
+        real.initialize(config);
+        resolve(real);
+      };
+      s.onerror = function () { loading = null; reject(new Error("Mermaid did not load")); };
+      document.head.appendChild(s);
+    }));
+  }
+  function near(el) {
+    if (real || !el || !("IntersectionObserver" in window)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); resolve(); }
+      }, { rootMargin: "100% 0px" });
+      io.observe(el);
+      waiting.push(function () { io.disconnect(); resolve(); });
+    });
+  }
+  window.addEventListener("beforeprint", function () { waiting.splice(0).forEach(function (go) { go(); }); });
+  window.mermaid = stub;
+})();
+</script>
 
   </head>
   
@@ -472,15 +513,19 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
         
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
+  
+  
+  
+    <a href="../quickstart/" class="md-nav__link">
+      
   
   
   <span class="md-ellipsis">
@@ -494,106 +539,12 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Get started
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Quickstart
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../hardware/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Hardware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -623,15 +574,19 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
         
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-            
+  
+  
+  
+    <a href="../architecture/" class="md-nav__link">
+      
   
   
   <span class="md-ellipsis">
@@ -645,106 +600,12 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Concepts
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Architecture
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../graphics/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Graphics
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../animations/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Animations
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -778,15 +639,19 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
         
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
-            
+  
+  
+  
+    <a href="../api-guide/" class="md-nav__link">
+      
   
   
   <span class="md-ellipsis">
@@ -800,162 +665,12 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Guides
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api-guide/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    API guide
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../porting/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Porting
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../examples/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Examples
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../troubleshooting/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -993,6 +708,8 @@
         
       
     
+    
+      
     
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
@@ -1200,20 +917,20 @@ not redrawn, when the code changes. CI runs <code>hardfoc-docs figures --check</
 committed figure no longer matches the code. Each figure below lists the files it is drawn from.</p>
 <h2 id="three-layers-one-of-them-yours">Three layers, one of them yours<a class="headerlink" href="#three-layers-one-of-them-yours" title="Permanent link">&para;</a></h2>
 <figure class="hf-figure">
-<img src="driver-layers.svg#only-light" alt="Layer diagram: the application draws into a graphics context and calls the hardware-agnostic SmartDisplay driver, which uses the CRTP SPI interface, which calls the platform port you write, which drives the SPI bus, the D/C, SS, RES and VCC enable lines and reads the switch of the ISF15ACP4." width="1200" loading="lazy"><img src="driver-layers.dark.svg#only-dark" alt="Layer diagram: the application draws into a graphics context and calls the hardware-agnostic SmartDisplay driver, which uses the CRTP SPI interface, which calls the platform port you write, which drives the SPI bus, the D/C, SS, RES and VCC enable lines and reads the switch of the ISF15ACP4." width="1200" loading="lazy">
+<img src="driver-layers.svg#only-light" alt="Layer diagram: the application draws into a graphics context and calls the hardware-agnostic SmartDisplay driver, which uses the CRTP SPI interface, which calls the platform port you write, which drives the SPI bus, the D/C, SS, RES and VCC enable lines and reads the switch of the ISF15ACP4." width="1200" height="932"><img src="driver-layers.dark.svg#only-dark" alt="Layer diagram: the application draws into a graphics context and calls the hardware-agnostic SmartDisplay driver, which uses the CRTP SPI interface, which calls the platform port you write, which drives the SPI bus, the D/C, SS, RES and VCC enable lines and reads the switch of the ISF15ACP4." width="1200" height="932">
 <figcaption>Three layers, one of them yours</figcaption>
 </figure>
 
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom. Your application draws into a GraphicsContext and calls one SmartDisplay<SpiType> object, whose public calls (listed from inc/isf15acp4.hpp) initialise the SSD1331 controller, upload frames, run its hardware drawing commands and read the switch. Each call becomes command and data transactions. The communication interface (SpiInterface in inc/isf15acp4_spi_interface.hpp) is a CRTP base that forwards them to your class. The platform port is the only code you write: a class that writes SPI bytes with D/C and SS, sets the control pins, reads the switch and waits. Below it is the hardware.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/inc/isf15acp4.hpp"><code>inc/isf15acp4.hpp</code></a> <code>SmartDisplay public calls</code>; <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/inc/isf15acp4.hpp"><code>inc/isf15acp4.hpp</code></a> <code>SmartDisplay public calls</code>; <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
 </details>
-<p>Figure module: <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a></p>
+<p>Figure module: <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a></p>
 <p>Drawn from:</p>
 <ul>
-<li><code>SmartDisplay public calls</code> in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/inc/isf15acp4.hpp"><code>inc/isf15acp4.hpp</code></a></li>
-<li><code>SpiInterface</code> in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/a9a8fa4e7ec8460dc4e7d36612612a281ec0fe31/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a></li>
+<li><code>SmartDisplay public calls</code> in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/inc/isf15acp4.hpp"><code>inc/isf15acp4.hpp</code></a></li>
+<li><code>SpiInterface</code> in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a></li>
 </ul>
 
 
@@ -1331,7 +1048,7 @@ committed figure no longer matches the code. Each figure below lists the files i
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "navigation.instant", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.prune", "navigation.top", "navigation.footer", "navigation.tracking", "navigation.instant", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
