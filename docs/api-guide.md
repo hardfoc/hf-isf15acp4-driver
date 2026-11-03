@@ -144,8 +144,9 @@ period, so call `Update()` more often than that.
 | `NotInitialized` | `EnsureInitialized()` failed, or pixels before `Initialize()` |
 | `InvalidParam` | No port, an odd pixel byte count, a wrong-size canvas |
 | `OutOfRange` | A window off the panel, a master current above 15 |
+| `GpioControl` | Your `GpioSet()` returned `false` during `Initialize()`; no command was sent |
+| `PowerSequence` | That pin was RES or VCC enable: the reset pulse or the drive supply did not happen (set with `GpioControl`) |
 
 `GetLastError()` is the most recent error; `GetErrorFlags()` is every error since the last `ClearErrorFlags()`.
-`Error::GpioControl` and `Error::PowerSequence` exist in the enum but nothing sets them yet. The display sends
-nothing back, so the driver cannot tell a missing or unpowered module from a working one:
+The display sends nothing back, so the driver cannot tell a missing or unpowered module from a working one:
 [Troubleshooting](troubleshooting.md) starts there.
