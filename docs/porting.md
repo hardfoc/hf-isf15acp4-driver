@@ -27,11 +27,13 @@ nothing to allocate.
 | `BeginData()` | D/C high, then SS low: display data follows |
 | `EndTransaction()` | SS high, after the last bit has left |
 | `WriteBytes(data, len)` | Send `len` bytes (up to 12,288), blocking until sent |
-| `GpioSet(pin, signal)` | Drive SS, D/C, RES or VCC enable `Active` / `Inactive` |
+| `GpioSet(pin, signal)` | Drive SS, D/C, RES or VCC enable `Active` / `Inactive`; `true` when the pin was driven (or is not wired), `false` on a GPIO error |
 | `GpioRead(pin)` | `true` when `Switch` is pressed, else `false` |
 | `DelayUs(us)` | Wait at least that long (the driver uses 3, 10 and 1000) |
 
-All return `bool` except `EndTransaction()`, `GpioSet()` and `DelayUs()`, which return `void`.
+All return `bool` except `EndTransaction()` and `DelayUs()`, which return `void`. `GpioSet()` must return `bool`
+(checked at compile time): a pin the port could not drive stops `Initialize()` before the first command, with
+`Error::GpioControl`, and also `Error::PowerSequence` for RES and VCC enable.
 
 ## SPI port
 

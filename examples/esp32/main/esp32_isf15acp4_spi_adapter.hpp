@@ -121,24 +121,22 @@ public:
         return err == ESP_OK;
     }
 
-    void GpioSet(isf15acp4::CtrlPin pin, isf15acp4::GpioSignal signal) noexcept {
+    /// True when the pin was driven; gpio_set_level() returns ESP_ERR_INVALID_ARG for a bad pin.
+    bool GpioSet(isf15acp4::CtrlPin pin, isf15acp4::GpioSignal signal) noexcept {
         const bool active = signal == isf15acp4::GpioSignal::Active;
         switch (pin) {
             case isf15acp4::CtrlPin::ChipSelect:
-                gpio_set_level(pins_.cs, active ? 0 : 1);
-                break;
+                return gpio_set_level(pins_.cs, active ? 0 : 1) == ESP_OK;
             case isf15acp4::CtrlPin::DataCommand:
-                gpio_set_level(pins_.dc, active ? 1 : 0);
-                break;
+                return gpio_set_level(pins_.dc, active ? 1 : 0) == ESP_OK;
             case isf15acp4::CtrlPin::Reset:
-                gpio_set_level(pins_.reset, active ? 0 : 1);
-                break;
+                return gpio_set_level(pins_.reset, active ? 0 : 1) == ESP_OK;
             case isf15acp4::CtrlPin::VccEnable:
-                gpio_set_level(pins_.vcc_enable, active ? 1 : 0);
-                break;
+                return gpio_set_level(pins_.vcc_enable, active ? 1 : 0) == ESP_OK;
             case isf15acp4::CtrlPin::Switch:
                 break;
         }
+        return true;
     }
 
     bool GpioRead(isf15acp4::CtrlPin pin) noexcept {

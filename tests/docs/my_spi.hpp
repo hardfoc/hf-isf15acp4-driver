@@ -15,7 +15,7 @@
 // Platform hooks: your SDK's calls. Declared only, so the docs build checks the port compiles.
 bool platform_spi_init() noexcept;                                       // SPI master, mode 0, <= 6.6 MHz
 bool platform_spi_write(const uint8_t* data, std::size_t len) noexcept;  // blocking: returns when sent
-void platform_gpio_write(int gpio, bool level) noexcept;
+bool platform_gpio_write(int gpio, bool level) noexcept;  // false on a GPIO error
 bool platform_gpio_read(int gpio) noexcept;
 void platform_delay_us(uint32_t us) noexcept;
 
@@ -41,15 +41,18 @@ public:
     return platform_spi_write(data, len);
   }
 
-  void GpioSet(isf15acp4::CtrlPin pin, isf15acp4::GpioSignal signal) noexcept {
+  // Return false when the GPIO call failed: Initialize() then stops with Error::GpioControl
+  // (and Error::PowerSequence for RES# and VCC).
+  bool GpioSet(isf15acp4::CtrlPin pin, isf15acp4::GpioSignal signal) noexcept {
     const bool active = signal == isf15acp4::GpioSignal::Active;
     switch (pin) {
-      case isf15acp4::CtrlPin::ChipSelect:  platform_gpio_write(kCs, !active); break;   // SS active low
-      case isf15acp4::CtrlPin::DataCommand: platform_gpio_write(kDc, active); break;    // high = data
-      case isf15acp4::CtrlPin::Reset:       platform_gpio_write(kRes, !active); break;  // RES# active low
-      case isf15acp4::CtrlPin::VccEnable:   platform_gpio_write(kVccEn, active); break;
+      case isf15acp4::CtrlPin::ChipSelect:  return platform_gpio_write(kCs, !active);   // SS active low
+      case isf15acp4::CtrlPin::DataCommand: return platform_gpio_write(kDc, active);    // high = data
+      case isf15acp4::CtrlPin::Reset:       return platform_gpio_write(kRes, !active);  // RES# active low
+      case isf15acp4::CtrlPin::VccEnable:   return platform_gpio_write(kVccEn, active);
       case isf15acp4::CtrlPin::Switch:      break;                                      // input only
     }
+    return true;
   }
 
   // The switch closes pins 1-2; wired to GND with a pull-up, pressed reads low.

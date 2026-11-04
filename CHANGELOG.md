@@ -8,6 +8,12 @@ code that used the affected API; together they call for a major version bump at 
 
 ### Breaking changes
 
+- **BREAKING** The port's `GpioSet()` returns `bool` (`true` = pin driven or not wired, `false` = GPIO error)
+  instead of `void`; `SmartDisplay` rejects a port whose `GpioSet()` returns anything else at compile time, and
+  `SpiInterface::GpioSet()`, `GpioSetActive()` and `GpioSetInactive()` return the result. `Initialize()` (and
+  `Reset()`) stop at the first pin that could not be driven, before any command is sent, and report
+  `Error::GpioControl`, plus `Error::PowerSequence` when the pin is RES# or the VCC enable. Both errors existed
+  but nothing could set them. Ports: return the GPIO call's result.
 - **BREAKING** `CtrlPin::Reset` now means "held in reset": `Initialize()` drives it `Active` for at least 3 µs, then
   `Inactive`, and leaves it `Inactive` (SSD1331 rev 1.2 section 7.9, Table 18). Map `Active` to the low RES# level,
   like `ChipSelect`. Ports that followed the earlier workaround (`Active` = high) must invert their `Reset` mapping;

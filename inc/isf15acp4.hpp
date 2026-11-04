@@ -7,6 +7,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
+#include <utility>
 
 #include "isf15acp4_button_ui.hpp"
 #include "isf15acp4_canvas.hpp"
@@ -29,6 +31,11 @@ namespace isf15acp4 {
  */
 template <typename SpiType>
 class SmartDisplay {
+    static_assert(std::is_same_v<decltype(std::declval<SpiType&>().GpioSet(CtrlPin::Reset, GpioSignal::Active)),
+                                 bool>,
+                  "isf15acp4::SmartDisplay: the port's GpioSet(CtrlPin, GpioSignal) must return bool "
+                  "(true = pin driven, false = GPIO error)");
+
 public:
     /**
      * @brief Construct with explicit configuration (variant + graphics backend).
@@ -212,7 +219,8 @@ private:
     bool sendCommand(uint8_t cmd, const uint8_t* data, uint8_t len) noexcept;
     bool sendCommandByte(uint8_t cmd, uint8_t data) noexcept;
     bool sendCommandOnly(uint8_t cmd) noexcept;
-    void pulseReset() noexcept;
+    bool pulseReset() noexcept;
+    bool setPin(CtrlPin pin, GpioSignal signal, bool power_sequence) noexcept;
     bool runInitTable() noexcept;
     static void colorToSsd1331(Color565 color, uint8_t out[3]) noexcept;
     [[nodiscard]] Rect toRam(const Rect& rect) const noexcept;

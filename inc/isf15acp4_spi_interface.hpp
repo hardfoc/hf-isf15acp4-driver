@@ -7,6 +7,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
+#include <utility>
 
 namespace isf15acp4 {
 
@@ -98,9 +100,13 @@ public:
      * @brief Drive a control pin to an abstract signal level.
      * @param pin Control signal identifier.
      * @param signal Desired abstract level.
+     * @return true when the pin was driven (or is not wired on this board); false when the GPIO
+     *         call failed. The driver reports a failure as Error::GpioControl, and as
+     *         Error::PowerSequence for RES# and VCC enable. The port's GpioSet() must return
+     *         bool (checked at compile time).
      */
-    void GpioSet(CtrlPin pin, GpioSignal signal) noexcept {
-        static_cast<Derived*>(this)->GpioSet(pin, signal);
+    bool GpioSet(CtrlPin pin, GpioSignal signal) noexcept {
+        return static_cast<Derived*>(this)->GpioSet(pin, signal);
     }
 
     /**
@@ -116,8 +122,8 @@ public:
      */
     void DelayUs(uint32_t us) noexcept { static_cast<Derived*>(this)->DelayUs(us); }
 
-    void GpioSetActive(CtrlPin pin) noexcept { GpioSet(pin, GpioSignal::Active); }
-    void GpioSetInactive(CtrlPin pin) noexcept { GpioSet(pin, GpioSignal::Inactive); }
+    bool GpioSetActive(CtrlPin pin) noexcept { return GpioSet(pin, GpioSignal::Active); }
+    bool GpioSetInactive(CtrlPin pin) noexcept { return GpioSet(pin, GpioSignal::Inactive); }
 
     SpiInterface(const SpiInterface&) = delete;
     SpiInterface& operator=(const SpiInterface&) = delete;
