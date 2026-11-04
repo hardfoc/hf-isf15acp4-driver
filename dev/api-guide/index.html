@@ -1194,7 +1194,7 @@
 <p>How to do the common jobs with the driver: initialise, draw, use the controller's drawing commands, set brightness,
 read the switch and handle errors.</p>
 <p>Every snippet on this page is compiled by the host CI from
-<a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/tests/docs/api_tasks.cpp"><code>tests/docs/api_tasks.cpp</code></a>, with <code>Display</code> standing for
+<a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/tests/docs/api_tasks.cpp"><code>tests/docs/api_tasks.cpp</code></a>, with <code>Display</code> standing for
 <code>isf15acp4::SmartDisplay&lt;MySpi&gt;</code> and <code>colors</code> for <code>isf15acp4::colors</code>. The <a href="../api-reference/">API reference</a>
 lists every member.</p>
 <h2 id="the-shape-of-the-api">The shape of the API<a class="headerlink" href="#the-shape-of-the-api" title="Permanent link">&para;</a></h2>
@@ -1483,11 +1483,18 @@ period, so call <code>Update()</code> more often than that.</p>
 <td><code>OutOfRange</code></td>
 <td>A window off the panel, a master current above 15</td>
 </tr>
+<tr>
+<td><code>GpioControl</code></td>
+<td>Your <code>GpioSet()</code> returned <code>false</code> during <code>Initialize()</code>; no command was sent</td>
+</tr>
+<tr>
+<td><code>PowerSequence</code></td>
+<td>That pin was RES or VCC enable: the reset pulse or the drive supply did not happen (set with <code>GpioControl</code>)</td>
+</tr>
 </tbody>
 </table>
 <p><code>GetLastError()</code> is the most recent error; <code>GetErrorFlags()</code> is every error since the last <code>ClearErrorFlags()</code>.
-<code>Error::GpioControl</code> and <code>Error::PowerSequence</code> exist in the enum but nothing sets them yet. The display sends
-nothing back, so the driver cannot tell a missing or unpowered module from a working one:
+The display sends nothing back, so the driver cannot tell a missing or unpowered module from a working one:
 <a href="../troubleshooting/">Troubleshooting</a> starts there.</p>
 
 

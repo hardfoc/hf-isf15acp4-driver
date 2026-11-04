@@ -1093,6 +1093,12 @@ affected API.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
 <h3 id="breaking-changes">Breaking changes<a class="headerlink" href="#breaking-changes" title="Permanent link">&para;</a></h3>
 <ul>
+<li><strong>BREAKING</strong> The port's <code>GpioSet()</code> returns <code>bool</code> (<code>true</code> = pin driven or not wired, <code>false</code> = GPIO error)
+  instead of <code>void</code>; <code>SmartDisplay</code> rejects a port whose <code>GpioSet()</code> returns anything else at compile time, and
+  <code>SpiInterface::GpioSet()</code>, <code>GpioSetActive()</code> and <code>GpioSetInactive()</code> return the result. <code>Initialize()</code> (and
+  <code>Reset()</code>) stop at the first pin that could not be driven, before any command is sent, and report
+  <code>Error::GpioControl</code>, plus <code>Error::PowerSequence</code> when the pin is RES# or the VCC enable. Both errors existed
+  but nothing could set them. Ports: return the GPIO call's result.</li>
 <li><strong>BREAKING</strong> <code>CtrlPin::Reset</code> now means "held in reset": <code>Initialize()</code> drives it <code>Active</code> for at least 3 µs, then
   <code>Inactive</code>, and leaves it <code>Inactive</code> (SSD1331 rev 1.2 section 7.9, Table 18). Map <code>Active</code> to the low RES# level,
   like <code>ChipSelect</code>. Ports that followed the earlier workaround (<code>Active</code> = high) must invert their <code>Reset</code> mapping;

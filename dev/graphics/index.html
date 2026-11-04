@@ -1104,7 +1104,7 @@
 
 <h1 id="graphics">Graphics<a class="headerlink" href="#graphics" title="Permanent link">&para;</a></h1>
 <p>How drawing works: the graphics context and its three backends, colours, text, images and what a frame costs.</p>
-<p>Snippets on this page are compiled from <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/tests/docs/graphics.cpp"><code>tests/docs/graphics.cpp</code></a>.</p>
+<p>Snippets on this page are compiled from <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/tests/docs/graphics.cpp"><code>tests/docs/graphics.cpp</code></a>.</p>
 <h2 id="the-graphics-context">The graphics context<a class="headerlink" href="#the-graphics-context" title="Permanent link">&para;</a></h2>
 <p><code>GraphicsContext</code> is the surface your code draws on. <code>display.CreateGraphicsContext()</code> returns one with the
 display's variant and backend; you can also construct one directly with
@@ -1234,7 +1234,7 @@ it is drawn. Only <code>WritePixels()</code> sends bytes unchanged: give it pane
 a line holds 16 characters and the panel 8 lines at a 8-pixel pitch. Characters outside that range are skipped
 (their cell is left as it was). Strings do not wrap; text past the right edge is clipped.</p>
 <h2 id="images">Images<a class="headerlink" href="#images" title="Permanent link">&para;</a></h2>
-<p>Convert a PNG to a C++ array with <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/scripts/convert_image_to_rgb565.py"><code>scripts/convert_image_to_rgb565.py</code></a>
+<p>Convert a PNG to a C++ array with <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/scripts/convert_image_to_rgb565.py"><code>scripts/convert_image_to_rgb565.py</code></a>
 (needs Pillow):</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python3<span class="w"> </span>scripts/convert_image_to_rgb565.py<span class="w"> </span>icon.png<span class="w"> </span>-o<span class="w"> </span>main/icon.hpp<span class="w"> </span>-n<span class="w"> </span>Icon<span class="w"> </span>-W<span class="w"> </span><span class="m">16</span><span class="w"> </span>-H<span class="w"> </span><span class="m">16</span>
 </span></code></pre></div>

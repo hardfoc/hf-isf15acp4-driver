@@ -1078,7 +1078,7 @@
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom. Your application draws into a GraphicsContext and calls one SmartDisplay<SpiType> object, whose public calls (listed from inc/isf15acp4.hpp) initialise the SSD1331 controller, upload frames, run its hardware drawing commands and read the switch. Each call becomes command and data transactions. The communication interface (SpiInterface in inc/isf15acp4_spi_interface.hpp) is a CRTP base that forwards them to your class. The platform port is the only code you write: a class that writes SPI bytes with D/C and SS, sets the control pins, reads the switch and waits. Below it is the hardware.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/inc/isf15acp4.hpp"><code>inc/isf15acp4.hpp</code></a> <code>SmartDisplay public calls</code>; <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/inc/isf15acp4.hpp"><code>inc/isf15acp4.hpp</code></a> <code>SmartDisplay public calls</code>; <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/inc/isf15acp4_spi_interface.hpp"><code>inc/isf15acp4_spi_interface.hpp</code></a> <code>SpiInterface</code>; figure module <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/docs/diagrams/figures/driver-layers.py"><code>docs/diagrams/figures/driver-layers.py</code></a>.</p>
 </details>
 <h2 id="the-three-layers">The three layers<a class="headerlink" href="#the-three-layers" title="Permanent link">&para;</a></h2>
 <table>
@@ -1197,7 +1197,7 @@ does not depend on your port type.</p>
 <p>Keep a <code>GraphicsContext</code> as a static or long-lived object rather than on a small task stack, and give the task that
 calls <code>FillScreen()</code> at least 13 KB of stack.</p>
 <h2 id="source-map">Source map<a class="headerlink" href="#source-map" title="Permanent link">&para;</a></h2>
-<p>Headers are in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/inc/isf15acp4.hpp"><code>inc/</code></a> and their template bodies (<code>.ipp</code>) in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/src/isf15acp4.ipp"><code>src/</code></a>;
+<p>Headers are in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/inc/isf15acp4.hpp"><code>inc/</code></a> and their template bodies (<code>.ipp</code>) in <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/src/isf15acp4.ipp"><code>src/</code></a>;
 every file name starts with <code>isf15acp4</code>.</p>
 <table>
 <thead>

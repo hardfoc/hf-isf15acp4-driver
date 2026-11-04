@@ -1178,7 +1178,7 @@ generated version header, and a <code>hf_isf15acp4Config.cmake</code> package:</
 as the source tree; the target adds <code>include/hf_isf15acp4/inc</code> to your include path. The host test
 <code>hf_isf15acp4_install_package</code> installs into the build tree and builds a consumer against it.</p>
 <h2 id="esp-idf">ESP-IDF<a class="headerlink" href="#esp-idf" title="Permanent link">&para;</a></h2>
-<p>The ESP-IDF component wrapper is <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/examples/esp32/components/hf_isf15acp4/CMakeLists.txt"><code>examples/esp32/components/hf_isf15acp4/</code></a>.
+<p>The ESP-IDF component wrapper is <a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/examples/esp32/components/hf_isf15acp4/CMakeLists.txt"><code>examples/esp32/components/hf_isf15acp4/</code></a>.
 Copy that folder into your project's <code>components/</code> (or point <code>EXTRA_COMPONENT_DIRS</code> at it) and set the
 <code>HF_ISF15ACP4_ROOT</code> cache variable to the driver checkout; the wrapper stops with a clear message when the path is
 wrong. Your component then declares <code>REQUIRES hf_isf15acp4</code>. The wrapper also brings the example's Kconfig menu
@@ -1197,15 +1197,15 @@ time), or provide your own with the four <code>HF_ISF15ACP4_VERSION_*</code> mac
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/cmake/hf_isf15acp4_build_settings.cmake">Settings</a></td>
+<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/cmake/hf_isf15acp4_build_settings.cmake">Settings</a></td>
 <td>Sources, include directories, version: the single source of truth</td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/CMakeLists.txt">Library</a></td>
+<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/CMakeLists.txt">Library</a></td>
 <td>Static library for host builds and CI</td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/8e0d420a69f0e8623a4cc625bbd7d1feedb03231/examples/esp32/components/hf_isf15acp4/CMakeLists.txt">ESP-IDF</a></td>
+<td><a href="https://github.com/hardfoc/hf-isf15acp4-driver/blob/2183cf69726662beb72f95dc00293f8a578dd786/examples/esp32/components/hf_isf15acp4/CMakeLists.txt">ESP-IDF</a></td>
 <td>Component wrapper over the same settings</td>
 </tr>
 </tbody>
